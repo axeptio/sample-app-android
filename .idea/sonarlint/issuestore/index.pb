@@ -56,3 +56,23 @@ s
 Csamplekotlin/src/main/java/io/axept/samplekotlin/MainApplication.kt,1/1/113124d5e8e84efafde6f75fe248c36eccbdd0a8
 Y
 )samplekotlin/src/main/AndroidManifest.xml,3/a/3a62509c935df2c1bb41db19cad1403ceb207359
+M
+samplejava/proguard-rules.pro,a/b/abb6cb0ac8e3e3da3cb7db9c4beec9598bbeba00
+O
+samplejava/google-services.json,3/0/306d62d8c50aa676265f8d36feb50f30a9d68983
+t
+Dsamplejava/src/main/java/com/davinciapp/samplejava/MainActivity.java,b/d/bdabea8870c31c382185aa78bdd51b62247155d7
+u
+Esamplejava/src/main/java/com/davinciapp/samplejava/MainViewModel.java,a/0/a0f7c727c14819b35cb8d5fb94b821c930eaf529
+z
+Jsamplejava/src/main/java/com/davinciapp/samplejava/PreferencesAdapter.java,d/6/d69b31bcb98327aac6239790d3ad0da4feaf7a83
+ƒ
+Ssamplejava/src/main/java/com/davinciapp/samplejava/SharedPreferencesRepository.java,9/7/97c559effb620ab8ee6adf9419e71017ca47792c
+W
+'samplejava/src/main/AndroidManifest.xml,6/c/6cda1edfe23e0c2c0ae28dbf02527034ec485ca8
+E
+samplejava/.gitignore,1/8/18a32a4472058639e528636e94282ca681105a10
+K
+samplejava/build.gradle.kts,4/d/4dd77c230050fc70fde1cd1ca0c839035a505dc7
+9
+	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
