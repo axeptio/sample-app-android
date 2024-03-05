@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "86456981453",
+    "project_id": "axeptio-sdk-sample",
+    "storage_bucket": "axeptio-sdk-sample.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:86456981453:android:1ba72ae176ab73ee80d684",
+        "android_client_info": {
+          "package_name": "io.axept.samplekotlin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAbpXl9CxRTuZlvJP75DqcANzLNXNvm9Dc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
