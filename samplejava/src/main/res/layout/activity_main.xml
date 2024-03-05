@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellowLight"
+    tools:context=".MainActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Axeptio | Java Sample"
+        app:titleTextColor="@color/black"
+        android:background="@color/yellow"
+        app:titleTextAppearance="@style/headline"
+        />
+
+    <Button
+        android:id="@+id/btn_popup"
+        android:layout_width="250.dp"
+        android:layout_height="62.dp"
+        android:backgroundTint="@color/yellow"
+        android:text="@string/consent_btn_label"
+        style="@style/labelLarge"
+        app:layout_constraintTop_toTopOf="@+id/toolbar"
+        app:layout_constraintBottom_toTopOf="@id/btn_preferences"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <Button
+        android:id="@+id/btn_preferences"
+        android:layout_width="250.dp"
+        android:layout_height="62.dp"
+        android:backgroundTint="@color/yellow"
+        android:text="@string/preferences_btn_label"
+        style="@style/labelLarge"
+        app:layout_constraintTop_toBottomOf="@id/btn_popup"
+        app:layout_constraintBottom_toTopOf="@id/btn_ad"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+
+    <Button
+        android:id="@+id/btn_ad"
+        android:layout_width="250.dp"
+        android:layout_height="62.dp"
+        android:backgroundTint="@color/yellow"
+        android:text="@string/ad_btn_label"
+        style="@style/labelLarge"
+        app:layout_constraintTop_toBottomOf="@id/btn_preferences"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/loader_layout"
+        android:visibility="visible"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/yellowLight"
+        android:alpha="0.6"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+            <ProgressBar
+                android:elevation="10.dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

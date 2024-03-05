@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="bodyLarge">
+        <item name="android:textColor">@color/black</item>
+        <item name="fontFamily">@font/alegreya</item>
+        <item name="android:textSize">16.sp</item>
+    </style>
+
+    <style name="labelLarge">
+        <item name="android:textColor">@color/black</item>
+        <item name="fontFamily">@font/alegreya</item>
+        <item name="android:textSize">17.sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="headline">
+        <item name="android:textColor">@color/black</item>
+        <item name="fontFamily">@font/alegreya</item>
+        <item name="android:textSize">21.sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

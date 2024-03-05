@@ -47,8 +47,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        //TODO find a way without this ugly instance()
-        // Make sure to initialize once the ui has been set up
         AxeptioSDK.instance().initialize(
             activity = this,
             configurationId = "62ac903ddf8cf90ca29d9585",

@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "sample-app-android"
 include(":samplekotlin")
+include(":samplejava")

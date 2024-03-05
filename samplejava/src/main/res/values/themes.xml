@@ -1,0 +1,11 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Tcfandroidsdk" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme.Tcfandroidsdk" parent="Base.Theme.Tcfandroidsdk" >
+        <item name="android:statusBarColor">@color/yellow</item>
+    </style>
+</resources>
