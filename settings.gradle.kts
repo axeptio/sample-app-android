@@ -13,8 +13,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
             credentials {
-                username = "" // TODO: Username
-                password = "" // TODO: Read package token
+                username = "" // TODO: GITHUB USERNAME
+                password = "" // TODO: GITHUB TOKEN
             }
         }
     }

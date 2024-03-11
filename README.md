@@ -14,11 +14,11 @@ To get started with implementing the Axeptio SDK in your Android app, follow the
 
 1. Clone this repository to your local machine:
 
-   ```bash
+   ```shell
    git clone https://github.com/axeptio/sample-app-android
 
 2. Provide your Github access token for the Axeptio SDK in the `settings.gradle.kts` project's file.
-```
+```kts
 maven {  
 	url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")  
 	credentials {  
@@ -29,10 +29,6 @@ maven {
 ```
 
 3.  Choose the appropriate sample module (samplejava or samplekotlin) based on your preferred language and UI framework.
-
-## Additional Resources
-
-For additional instructions and information about the Axeptio Mobile SDK implementation, please refer to the official documentation.
 
 # Axeptio SDK implementation
 
@@ -54,8 +50,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
             credentials {
-                username = "[Github username]"
-                password = "[read token provided by Axeptio]"
+               username = "[GITHUB_USERNAME]"
+               password = "[GITHUB_TOKEN]"
             }
         }
     }
@@ -68,8 +64,8 @@ repositories {
     maven {
         url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
         credentials {
-                username = "[Github username]"
-                password = "[read token provided by Axeptio]"
+           username = "[GITHUB_USERNAME]"
+           password = "[GITHUB_TOKEN]"
         }
    }
 }
