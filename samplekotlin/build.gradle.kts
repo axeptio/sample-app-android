@@ -12,8 +12,8 @@ android {
         applicationId = "io.axept.samplekotlin"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "0.3"
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -51,7 +51,7 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:sdk:1.0-alpha01")
+    implementation("io.axept.android:sdk:1.0-alpha02")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")

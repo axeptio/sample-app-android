@@ -121,7 +121,7 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
 
 The consent pop up will automatically open if the user's consents are expired or haven't been registered yet.
 
->By default, the user's consent choices expire after 28 days
+>By default, the user's consent choices expire after 6 months
 
 The SDK will automatically update the user's SharedPreferences according to the TCFv2 [IAB documentation](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details).
 
