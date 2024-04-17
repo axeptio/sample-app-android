@@ -53,6 +53,19 @@
         android:text="@string/ad_btn_label"
         style="@style/labelLarge"
         app:layout_constraintTop_toBottomOf="@id/btn_preferences"
+        app:layout_constraintBottom_toTopOf="@id/btn_clear_consents"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <Button
+        android:id="@+id/btn_clear_consents"
+        android:layout_width="250.dp"
+        android:layout_height="62.dp"
+        android:backgroundTint="@color/red"
+        android:text="@string/clear_consents_btn_label"
+        style="@style/labelLarge"
+        app:layout_constraintTop_toBottomOf="@id/btn_ad"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
