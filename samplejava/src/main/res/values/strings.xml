@@ -4,4 +4,5 @@
     <string name="preferences_btn_label">Shared Preferences</string>
     <string name="ad_btn_label">Google ad</string>
     <string name="clear_consents_btn_label">Clear consents</string>
+    <string name="open_url_btn_label">Shared consents url</string>
 </resources>

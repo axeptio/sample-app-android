@@ -82,3 +82,5 @@ Isamplekotlin/src/main/java/io/axept/samplekotlin/navigation/AppNavHost.kt,a/8/
 Ksamplekotlin/src/main/java/io/axept/samplekotlin/navigation/destinations.kt,6/8/688417273c51765deb4916ad7bc5cbca702de8f9
 x
 Hsamplekotlin/src/main/java/io/axept/samplekotlin/screen/WebViewScreen.kt,8/0/803f41ec528b9e51f8892494e7c01971a365e61e
+w
+Gsamplejava/src/main/java/com/davinciapp/samplejava/WebViewActivity.java,8/3/839c604bf10d45de6d89c01488cbe98a1bf3c4f2

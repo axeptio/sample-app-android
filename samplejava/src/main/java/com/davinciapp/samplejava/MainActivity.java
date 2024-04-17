@@ -1,5 +1,6 @@
 package com.davinciapp.samplejava;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         Button adBtn = findViewById(R.id.btn_ad);
         Button preferencesBtn = findViewById(R.id.btn_preferences);
         Button clearConsentsBtn = findViewById(R.id.btn_clear_consents);
+        Button sharedConsentsUrlBtn = findViewById(R.id.btn_open_url);
         ConstraintLayout loaderLayout = findViewById(R.id.loader_layout);
 
         mViewModel.loadingAd.observe(this, loading -> {
@@ -71,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
         adBtn.setOnClickListener(view -> loadAd());
         preferencesBtn.setOnClickListener(view -> showPreferencesDialog());
         clearConsentsBtn.setOnClickListener(view -> axeptio.clearConsents());
+        sharedConsentsUrlBtn.setOnClickListener(view ->
+                startActivity(new Intent(this, WebViewActivity.class))
+        );
     }
 
     private void setGoogleConsent() {

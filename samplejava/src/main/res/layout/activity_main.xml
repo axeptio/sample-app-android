@@ -11,85 +11,102 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
+        android:background="@color/yellow"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Axeptio | Java Sample"
-        app:titleTextColor="@color/black"
-        android:background="@color/yellow"
         app:titleTextAppearance="@style/headline"
-        />
-
-    <Button
-        android:id="@+id/btn_popup"
-        android:layout_width="250.dp"
-        android:layout_height="62.dp"
-        android:backgroundTint="@color/yellow"
-        android:text="@string/consent_btn_label"
-        style="@style/labelLarge"
-        app:layout_constraintTop_toTopOf="@+id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/btn_preferences"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-    <Button
-        android:id="@+id/btn_preferences"
-        android:layout_width="250.dp"
-        android:layout_height="62.dp"
-        android:backgroundTint="@color/yellow"
-        android:text="@string/preferences_btn_label"
-        style="@style/labelLarge"
-        app:layout_constraintTop_toBottomOf="@id/btn_popup"
-        app:layout_constraintBottom_toTopOf="@id/btn_ad"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-
-    <Button
-        android:id="@+id/btn_ad"
-        android:layout_width="250.dp"
-        android:layout_height="62.dp"
-        android:backgroundTint="@color/yellow"
-        android:text="@string/ad_btn_label"
-        style="@style/labelLarge"
-        app:layout_constraintTop_toBottomOf="@id/btn_preferences"
-        app:layout_constraintBottom_toTopOf="@id/btn_clear_consents"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
-
-    <Button
-        android:id="@+id/btn_clear_consents"
-        android:layout_width="250.dp"
-        android:layout_height="62.dp"
-        android:backgroundTint="@color/red"
-        android:text="@string/clear_consents_btn_label"
-        style="@style/labelLarge"
-        app:layout_constraintTop_toBottomOf="@id/btn_ad"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:titleTextColor="@color/black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/loader_layout"
-        android:visibility="visible"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/yellowLight"
-        android:alpha="0.6"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:paddingTop="50dp"
+        android:paddingBottom="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
+
+        <Button
+            android:id="@+id/btn_popup"
+            style="@style/labelLarge"
+            android:layout_width="250.dp"
+            android:layout_height="62.dp"
+            android:backgroundTint="@color/yellow"
+            android:text="@string/consent_btn_label"
+            app:layout_constraintBottom_toTopOf="@id/btn_preferences"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/btn_preferences"
+            style="@style/labelLarge"
+            android:layout_width="250.dp"
+            android:layout_height="62.dp"
+            android:backgroundTint="@color/yellow"
+            android:text="@string/preferences_btn_label"
+            app:layout_constraintBottom_toTopOf="@id/btn_ad"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_popup" />
+
+
+        <Button
+            android:id="@+id/btn_ad"
+            style="@style/labelLarge"
+            android:layout_width="250.dp"
+            android:layout_height="62.dp"
+            android:backgroundTint="@color/yellow"
+            android:text="@string/ad_btn_label"
+            app:layout_constraintBottom_toTopOf="@id/btn_open_url"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_preferences" />
+
+        <Button
+            android:id="@+id/btn_open_url"
+            style="@style/labelLarge"
+            android:layout_width="250.dp"
+            android:layout_height="62.dp"
+            android:backgroundTint="@color/yellow"
+            android:text="@string/open_url_btn_label"
+            app:layout_constraintBottom_toTopOf="@id/btn_clear_consents"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_ad" />
+
+        <Button
+            android:id="@+id/btn_clear_consents"
+            style="@style/labelLarge"
+            android:layout_width="250.dp"
+            android:layout_height="62.dp"
+            android:backgroundTint="@color/red"
+            android:text="@string/clear_consents_btn_label"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_open_url" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/loader_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:alpha="0.6"
+            android:background="@color/yellowLight"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="parent">
 
             <ProgressBar
-                android:elevation="10.dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:elevation="10.dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
