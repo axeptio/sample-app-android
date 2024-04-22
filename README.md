@@ -163,10 +163,14 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
 
 ### Sharing consents with other web views
 The SDK provides a helper function to append the `axeptio_token` query param to any URL.
+You can precise a custom user token or use the one currently stored in the SDK.
 
 **Kotlin**
 ```kotlin
-AxeptioSDK.instance().appendAxeptioToken(Uri.parse("https://myurl.com"))
+AxeptioSDK.instance().appendAxeptioToken(
+   uri = Uri.parse("https://myurl.com"),
+   token = AxeptioSDK.instance().token ?: ""
+)
 ```
 Will return `https://myurl.com?axeptio_token=[token]`
 

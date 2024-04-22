@@ -14,14 +14,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
+import io.axept.android.library.Axeptio
 import io.axept.android.library.AxeptioSDK
 
 @Composable
-fun WebViewScreen(
-    onBack: () -> Unit
+internal fun WebViewScreen(
+    customToken: String?,
+    onBack: () -> Unit,
+    axeptio: Axeptio = AxeptioSDK.instance()
 ) {
-    val url = AxeptioSDK.instance().appendAxeptioToken(
-        Uri.parse("https://google-cmp-partner.axept.io/cmp-for-publishers.html")
+    val url = axeptio.appendAxeptioToken(
+        uri = Uri.parse("https://google-cmp-partner.axept.io/cmp-for-publishers.html"),
+        token = customToken ?: axeptio.token ?: ""
     )
     val state = rememberWebViewState(url.toString())
 
@@ -41,7 +45,6 @@ fun WebViewScreen(
             }
         )
     }
-
 
 }
 

@@ -84,3 +84,5 @@ x
 Hsamplekotlin/src/main/java/io/axept/samplekotlin/screen/WebViewScreen.kt,8/0/803f41ec528b9e51f8892494e7c01971a365e61e
 w
 Gsamplejava/src/main/java/com/davinciapp/samplejava/WebViewActivity.java,8/3/839c604bf10d45de6d89c01488cbe98a1bf3c4f2
+z
+Jsamplekotlin/src/main/java/io/axept/samplekotlin/screen/TokenInputPopup.kt,7/f/7fa844e1968b7662645f2642f53a372209853d62

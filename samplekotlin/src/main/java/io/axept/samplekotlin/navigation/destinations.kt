@@ -10,5 +10,8 @@ object HomeDestination : Destination {
 
 object WebViewDestination : Destination {
     override val route = "webview_screen"
+}
 
+internal enum class ScreenArguments(val slug: String) {
+    TOKEN("token")
 }

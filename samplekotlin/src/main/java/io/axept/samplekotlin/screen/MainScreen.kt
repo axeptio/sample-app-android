@@ -48,7 +48,7 @@ import io.axept.samplekotlin.ui.theme.Yellow
 
 @Composable
 fun MainScreen(
-    onOpenWebView: () -> Unit
+    onOpenWebView: (token: String) -> Unit
 ) {
     val activity = LocalContext.current as MainActivity
     val viewModel: MainViewModel =
@@ -62,6 +62,9 @@ fun MainScreen(
     val adState = viewModel.adState.collectAsState()
 
     var showPreferencesPopup = remember {
+        mutableStateOf(false)
+    }
+    var showTokenInputPopup = remember {
         mutableStateOf(false)
     }
 
@@ -102,8 +105,10 @@ fun MainScreen(
                     )
 
                     AxeptioButton(
-                        label = "Shared consents url",
-                        onClick = onOpenWebView
+                        label = "Shared consents web view",
+                        onClick = {
+                            showTokenInputPopup.value = true
+                        }
                     )
 
                     AxeptioButton(
@@ -122,6 +127,12 @@ fun MainScreen(
                     }
                 }
 
+                if (showTokenInputPopup.value) {
+                    TokenInputPopup(
+                        onConfirm = { onOpenWebView(it) },
+                        onDismiss = {showTokenInputPopup.value = false}
+                    )
+                }
             }
         }
 
@@ -161,7 +172,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AxeptioTopBar() {
+internal fun AxeptioTopBar() {
     TopAppBar(
         title = {
             Text(
@@ -173,7 +184,7 @@ fun AxeptioTopBar() {
 }
 
 @Composable
-fun AxeptioButton(
+internal fun AxeptioButton(
     modifier: Modifier = Modifier,
     label: String,
     enabled: Boolean = true,
