@@ -17,6 +17,16 @@ public class WebViewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.webview);
 
+        String token = getIntent().getStringExtra(ARG_TOKEN);
+
+        if (token == null || token.isEmpty()) {
+            token = AxeptioSDK.instance().getToken();
+            if (token == null) {
+                token = "";
+            }
+        }
+
+
         WebView webview = findViewById(R.id.web_view);
 
         webview.getSettings().setJavaScriptEnabled(true);
@@ -24,7 +34,9 @@ public class WebViewActivity extends AppCompatActivity {
         webview.getSettings().setDomStorageEnabled(true);
 
         String baseUrl = "https://google-cmp-partner.axept.io/cmp-for-publishers.html";
-        Uri url = AxeptioSDK.instance().appendAxeptioToken(Uri.parse(baseUrl));
+        Uri url = AxeptioSDK.instance().appendAxeptioToken(Uri.parse(baseUrl), token);
         webview.loadUrl(url.toString());
     }
+
+    static String ARG_TOKEN = "token";
 }
