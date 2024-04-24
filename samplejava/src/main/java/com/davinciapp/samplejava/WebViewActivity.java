@@ -33,6 +33,14 @@ public class WebViewActivity extends AppCompatActivity {
         webview.setWebViewClient(new WebViewClient());
         webview.getSettings().setDomStorageEnabled(true);
 
+        webview.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                view.evaluateJavascript("localStorage.clear();", null);
+            }
+        });
+
         String baseUrl = "https://google-cmp-partner.axept.io/cmp-for-publishers.html";
         Uri url = AxeptioSDK.instance().appendAxeptioToken(Uri.parse(baseUrl), token);
         webview.loadUrl(url.toString());

@@ -1,6 +1,7 @@
 package io.axept.samplekotlin.screen
 
 import android.net.Uri
+import android.webkit.WebView
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -12,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.google.accompanist.web.AccompanistWebViewClient
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import io.axept.android.library.Axeptio
@@ -42,6 +44,12 @@ internal fun WebViewScreen(
             onCreated = {
                 it.settings.javaScriptEnabled = true
                 it.settings.domStorageEnabled = true
+            },
+            client = object : AccompanistWebViewClient() {
+                override fun onPageFinished(view: WebView, url: String?) {
+                    super.onPageFinished(view, url)
+                    view.evaluateJavascript("""localStorage.clear();""".trimIndent(), null)
+                }
             }
         )
     }
