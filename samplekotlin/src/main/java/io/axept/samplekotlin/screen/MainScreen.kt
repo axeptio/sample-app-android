@@ -61,11 +61,14 @@ fun MainScreen(
     val prefState = viewModel.state.collectAsState()
     val adState = viewModel.adState.collectAsState()
 
-    var showPreferencesPopup = remember {
+    val showPreferencesPopup = remember {
         mutableStateOf(false)
     }
-    var showTokenInputPopup = remember {
+    val showTokenInputPopup = remember {
         mutableStateOf(false)
+    }
+    val shouldLoadAdd = remember {
+        mutableIntStateOf(0)
     }
 
     Scaffold(
@@ -115,6 +118,7 @@ fun MainScreen(
                         label = "Clear consent",
                         onClick = {
                             AxeptioSDK.instance().clearConsents()
+                            shouldLoadAdd.value++
                         },
                         color = Red
                     )
@@ -137,10 +141,6 @@ fun MainScreen(
         }
 
         //-- Google add
-        val shouldLoadAdd = remember {
-            mutableIntStateOf(0)
-        }
-
         LaunchedEffect(shouldLoadAdd.value) {
             loadAd(
                 context = activity,
