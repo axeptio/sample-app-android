@@ -132,11 +132,11 @@ Additionally, you can request the consent popup to open on demand.
 
 **Kotlin**
 ```kotlin
-AxeptioSDK.instance().showConsentScreen(activity)
+AxeptioSDK.instance().showConsentScreen(activity = activity, managePreferencesUseCase = true)
 ```
 **Java**
 ```java
-AxeptioSDK.instance().showConsentScreen(activity);
+AxeptioSDK.instance().showConsentScreen(activity, true);
 ```
 
 ### Popup events

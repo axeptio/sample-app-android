@@ -93,7 +93,7 @@ fun MainScreen(
                     AxeptioButton(
                         label = "Consent pop up",
                         onClick = {
-                            AxeptioSDK.instance().showConsentScreen(activity)
+                            AxeptioSDK.instance().showConsentScreen(activity, true)
                         })
 
                     AxeptioButton(label = "Shared Preferences", onClick = {

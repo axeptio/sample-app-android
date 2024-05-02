@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             else loaderLayout.setVisibility(View.GONE);
         });
 
-        consentPopupBtn.setOnClickListener(view -> axeptio.showConsentScreen(this));
+        consentPopupBtn.setOnClickListener(view -> axeptio.showConsentScreen(this, true));
         adBtn.setOnClickListener(view -> loadAd());
         preferencesBtn.setOnClickListener(view -> showPreferencesDialog());
         clearConsentsBtn.setOnClickListener(view -> axeptio.clearConsents());
