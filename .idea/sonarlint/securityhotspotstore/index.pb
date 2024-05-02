@@ -76,3 +76,13 @@ K
 samplejava/build.gradle.kts,4/d/4dd77c230050fc70fde1cd1ca0c839035a505dc7
 9
 	README.md,8/e/8ec9a00bfd09b3190ac6b22251dbb1aa95a0579d
+y
+Isamplekotlin/src/main/java/io/axept/samplekotlin/navigation/AppNavHost.kt,a/8/a8cf74f34ada81e628f6536c40847ca270064c6f
+{
+Ksamplekotlin/src/main/java/io/axept/samplekotlin/navigation/destinations.kt,6/8/688417273c51765deb4916ad7bc5cbca702de8f9
+x
+Hsamplekotlin/src/main/java/io/axept/samplekotlin/screen/WebViewScreen.kt,8/0/803f41ec528b9e51f8892494e7c01971a365e61e
+w
+Gsamplejava/src/main/java/com/davinciapp/samplejava/WebViewActivity.java,8/3/839c604bf10d45de6d89c01488cbe98a1bf3c4f2
+z
+Jsamplekotlin/src/main/java/io/axept/samplekotlin/screen/TokenInputPopup.kt,7/f/7fa844e1968b7662645f2642f53a372209853d62

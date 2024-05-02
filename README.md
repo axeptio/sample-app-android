@@ -88,7 +88,7 @@ dependencies {
 For more details, you can refer to the [Github documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package).
 
 ## Initialize the SDK
-Initialize the SDK inside the onCreate() of your main activity
+Initialize the SDK inside the onCreate() of your main activity.
 
 **Kotlin**
 ```kotlin
@@ -97,8 +97,9 @@ override fun onCreate(savedInstanceState: Bundle?) {
   
 	AxeptioSDK.instance().initialize(  
 		activity = this@MainActivity,  
-		projectId = [your_project_id],  
-		configurationId = [your_configuration_id]  
+		cliendId = [your_client_id],  
+		cookiesVersion = [your_cookies_version],
+		token = [optional_consent_token]  
 	)  
   
 }
@@ -113,15 +114,15 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
 	axeptio.initialize(
 		MainActivity.this,
 		[your_project_id],  
-		[your_configuration_id]
+		[your_configuration_id],
+		[optional_consent_token]
 	);
   
 }
 ```
 
 The consent pop up will automatically open if the user's consents are expired or haven't been registered yet.
-
->By default, the user's consent choices expire after 6 months
+You can transfer a user's consents by providing his Axeptio token.
 
 The SDK will automatically update the user's SharedPreferences according to the TCFv2 [IAB documentation](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details).
 
@@ -131,11 +132,11 @@ Additionally, you can request the consent popup to open on demand.
 
 **Kotlin**
 ```kotlin
-AxeptioSDK.instance().showConsentScreen(activity)
+AxeptioSDK.instance().showConsentScreen(activity = activity, managePreferencesUseCase = true)
 ```
 **Java**
 ```java
-AxeptioSDK.instance().showConsentScreen(activity);
+AxeptioSDK.instance().showConsentScreen(activity, true);
 ```
 
 ### Popup events
@@ -158,6 +159,26 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
 		AxeptioEventListener.super.onPopupClosedEvent();
 	}
 });
+```
+
+### Sharing consents with other web views
+The SDK provides a helper function to append the `axeptio_token` query param to any URL.
+You can precise a custom user token or use the one currently stored in the SDK.
+
+**Kotlin**
+```kotlin
+AxeptioSDK.instance().appendAxeptioToken(
+   uri = Uri.parse("https://myurl.com"),
+   token = AxeptioSDK.instance().token ?: ""
+)
+```
+Will return `https://myurl.com?axeptio_token=[token]`
+
+### Clear user's consent choices
+
+**Kotlin**
+```kotlin
+AxeptioSDK.instance().clearConsents()
 ```
 
 ## Google Consent v2

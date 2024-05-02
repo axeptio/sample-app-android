@@ -1,9 +1,12 @@
 package com.davinciapp.samplejava;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -45,7 +48,12 @@ public class MainActivity extends AppCompatActivity {
         MobileAds.initialize(this);
 
         Axeptio axeptio = AxeptioSDK.instance();
-        axeptio.initialize(MainActivity.this, "5fbfa806a0787d3985c6ee5f", "62ac903ddf8cf90ca29d9585");
+        axeptio.initialize(
+                MainActivity.this,
+                "5fbfa806a0787d3985c6ee5f",
+                "google cmp partner program sandbox-en-EU",
+                null
+        );
         setGoogleConsent();
 
         mViewModel = new ViewModelProvider(this, new MainViewModel.Factory(getApplication())).get(MainViewModel.class);
@@ -53,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
         Button consentPopupBtn = findViewById(R.id.btn_popup);
         Button adBtn = findViewById(R.id.btn_ad);
         Button preferencesBtn = findViewById(R.id.btn_preferences);
+        Button clearConsentsBtn = findViewById(R.id.btn_clear_consents);
+        Button sharedConsentsUrlBtn = findViewById(R.id.btn_open_url);
         ConstraintLayout loaderLayout = findViewById(R.id.loader_layout);
 
         mViewModel.loadingAd.observe(this, loading -> {
@@ -60,9 +70,13 @@ public class MainActivity extends AppCompatActivity {
             else loaderLayout.setVisibility(View.GONE);
         });
 
-        consentPopupBtn.setOnClickListener(view -> axeptio.showConsentScreen(this));
+        consentPopupBtn.setOnClickListener(view -> axeptio.showConsentScreen(this, true));
         adBtn.setOnClickListener(view -> loadAd());
         preferencesBtn.setOnClickListener(view -> showPreferencesDialog());
+        clearConsentsBtn.setOnClickListener(view -> axeptio.clearConsents());
+        sharedConsentsUrlBtn.setOnClickListener(view ->
+                showTokenInputDialog()
+        );
     }
 
     private void setGoogleConsent() {
@@ -146,6 +160,24 @@ public class MainActivity extends AppCompatActivity {
         recycler.setAdapter(new PreferencesAdapter(mViewModel.getSharedPreferences().toArray(new PrefencesItemUI[0])));
 
         new AlertDialog.Builder(MainActivity.this).setView(view).show();
+    }
+
+    private void showTokenInputDialog() {
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+        View view = LayoutInflater.from(this).inflate(R.layout.token_input_dialog, null);
+
+        Button showBtn = view.findViewById(R.id.btn_token_input_open_url);
+        EditText tokenEditText = view.findViewById(R.id.edit_text);
+
+        showBtn.setOnClickListener(view1 -> {
+            Intent intent = new Intent(view1.getContext(), WebViewActivity.class);
+            intent.putExtra(WebViewActivity.ARG_TOKEN, tokenEditText.getText());
+            startActivity(intent);
+            dialog.dismiss();
+        });
+
+        dialog.setView(view);
+        dialog.show();
     }
 
 }
