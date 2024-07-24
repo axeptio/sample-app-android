@@ -187,6 +187,7 @@ Instructions on how to integrate **Google Consent Mode** with the Axeptio SDK in
 
 > If you haven't already, add [Firebase Analytics](https://developers.google.com/tag-platform/security/guides/app-consent?hl=en&platform=android&consentmode=advanced#kotlin)  to your Android project.
 
+When user consent is collected through your CMP, the SDK will set the IABTCF_EnableAdvertiserConsentMode key in the Shared Preferences to true.
 
 ### Register to Google Consent updates
 
