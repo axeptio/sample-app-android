@@ -48,10 +48,10 @@ class MainActivity : ComponentActivity() {
 
         AxeptioSDK.instance().initialize(
             activity = this,
+            targetService = targetService,
             clientId = BuildConfig.AXEPTIO_CLIENT_ID,
             cookiesVersion = BuildConfig.AXEPTIO_COOKIES_VERSION,
-            token = null,
-            targetService = targetService
+            token = null
         )
 
         // Google consent v2 implementation

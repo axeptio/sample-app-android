@@ -33,6 +33,7 @@ import io.axept.android.googleconsent.GoogleConsentType;
 import io.axept.android.library.Axeptio;
 import io.axept.android.library.AxeptioEventListener;
 import io.axept.android.library.AxeptioSDK;
+import io.axept.android.library.AxeptioService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,11 +46,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AxeptioService targetService = getAxeptioService(BuildConfig.AXEPTIO_TARGET_SERVICE);
+
         MobileAds.initialize(this);
 
         Axeptio axeptio = AxeptioSDK.instance();
         axeptio.initialize(
                 MainActivity.this,
+                targetService,
                 BuildConfig.AXEPTIO_CLIENT_ID,
                 BuildConfig.AXEPTIO_COOKIES_VERSION,
                 null
@@ -178,6 +182,14 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.setView(view);
         dialog.show();
+    }
+
+    private AxeptioService getAxeptioService(String id) {
+        if (id == "publishers") {
+            return AxeptioService.PUBLISHERS_TCF;
+        } else {
+            return AxeptioService.BRANDS;
+        }
     }
 
 }

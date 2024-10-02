@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:sdk:1.2.0")
+    implementation("io.axept.android:sdk:1.3.0-dev02")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")

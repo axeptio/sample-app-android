@@ -10,6 +10,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 
+import io.axept.android.library.AxeptioService;
+import io.axept.android.model.AxeptioCookies;
+
 public class MainViewModel extends ViewModel {
 
     private SharedPreferencesRepository prefRepo;
@@ -29,16 +32,24 @@ public class MainViewModel extends ViewModel {
     ArrayList<PrefencesItemUI> getSharedPreferences() {
         ArrayList<PrefencesItemUI> items = new ArrayList<>();
 
-        for (TCFFields field : TCFFields.values()) {
-            String value = prefRepo.get(field.key, field.type);
-            if (value.length() > 100) {
-                value = value.subSequence(0, 100) + "...";
-            }
+        if (BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers") {
+            for (TCFFields field : TCFFields.values()) {
+                String value = prefRepo.get(field.key, field.type);
+                if (value.length() > 100) {
+                    value = value.subSequence(0, 100) + "...";
+                }
 
-            items.add(
-                    new PrefencesItemUI(field.key, value)
-            );
+                items.add(
+                        new PrefencesItemUI(field.key, value)
+                );
+            }
+        } else if (BuildConfig.AXEPTIO_TARGET_SERVICE == "brands") {
+            for (COOKIE_FIELDS field : COOKIE_FIELDS.values()) {
+                String value = prefRepo.get(field.getKey(), String.class);
+                items.add(new PrefencesItemUI(field.getKey(), value));
+            }
         }
+
         return items;
     }
 
