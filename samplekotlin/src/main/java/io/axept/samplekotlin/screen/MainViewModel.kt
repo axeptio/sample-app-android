@@ -4,6 +4,8 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import io.axept.android.library.AxeptioService
+import io.axept.samplekotlin.repository.COOKIE_FIELDS
 import io.axept.samplekotlin.repository.SharedPreferencesRepositoryImpl
 import io.axept.samplekotlin.repository.TCFFields
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,32 +25,66 @@ class MainViewModel private constructor(
 
     init {
         prefsRepo.listen()
-
-        TCFFields.entries.map {
-            updatePreferenceFieldValue(it)
-        }
-
-        viewModelScope.launch {
-            prefsRepo.hasUpdated.collect { key ->
-                val field = TCFFields.entries.firstOrNull { it.key == key }
-                field ?: return@collect
-                updatePreferenceFieldValue(field)
-            }
-        }
-
     }
 
-    private fun updatePreferenceFieldValue(field: TCFFields) {
-        var value = prefsRepo.get(field.key, field.type)
-        value.apply {
-            if (this.length > 500) value = substring(0, 300) // Trim value for performance
+    fun setTargetService(service: AxeptioService) {
+        viewModelScope.launch {
+            observePreferences(service)
+
+            when (service) {
+                AxeptioService.PUBLISHERS_TCF -> {
+                    TCFFields.entries.map { tcfField ->
+                        val value = prefsRepo.get(tcfField.key, tcfField.type)
+                        updatePreferenceFieldValue(tcfField.key, value)
+                    }
+                }
+
+                AxeptioService.BRANDS -> {
+                    COOKIE_FIELDS.entries.map { cookie ->
+                        val value = prefsRepo.get(cookie.key, String)
+                        updatePreferenceFieldValue(cookie.key, value)
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun observePreferences(service: AxeptioService) {
+        prefsRepo.hasUpdated.collect { key ->
+            key ?: return@collect
+            if (service == AxeptioService.PUBLISHERS_TCF
+                && TCFFields.entries.map { it.key }.contains(key)
+            ) {
+                TCFFields.entries.firstOrNull { it.key == key }?.let { field ->
+                    val value = prefsRepo.get(key, field.type)
+                    updatePreferenceFieldValue(key, value)
+                }
+            } else {
+                if (service == AxeptioService.BRANDS
+                    && COOKIE_FIELDS.entries.map { it.key }.contains(key)
+                ) {
+                    COOKIE_FIELDS.entries.firstOrNull { it.key == key }?.let { _ ->
+                        val value = prefsRepo.get(key, String)
+                        updatePreferenceFieldValue(key, value)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updatePreferenceFieldValue(key: String, value: String) {
+        var trimmedValue = value
+        trimmedValue.apply {
+            if (this.length > 500) trimmedValue = substring(0, 300) // Trim value for performance
         }
         val map = state.value.fields.toMutableMap()
-        map[field] = value
+        if (trimmedValue.isEmpty()) {
+            map.remove(key)
+        } else {
+            map[key] = trimmedValue
+        }
         _state.update {
-            it.copy(
-                fields = map
-            )
+            it.copy(fields = map)
         }
     }
 
@@ -72,7 +108,7 @@ class MainViewModel private constructor(
     }
 
     data class PreferenceStateUI(
-        val fields: Map<TCFFields, String>
+        val fields: Map<String, String>
     )
 
     data class AddStateUI(

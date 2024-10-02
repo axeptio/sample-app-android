@@ -36,7 +36,7 @@ fun PreferencesDisplay(state: MainViewModel.PreferenceStateUI) {
             items(items = state.fields.toList()) { pair ->
                 Column {
                     Text(
-                        text = pair.first.key,
+                        text = pair.first,
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Text(

@@ -41,6 +41,7 @@ import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import io.axept.android.library.AxeptioEventListener
 import io.axept.android.library.AxeptioSDK
+import io.axept.android.library.AxeptioService
 import io.axept.samplekotlin.MainActivity
 import io.axept.samplekotlin.TAG
 import io.axept.samplekotlin.ui.theme.Red
@@ -48,6 +49,7 @@ import io.axept.samplekotlin.ui.theme.Yellow
 
 @Composable
 fun MainScreen(
+    targetService: AxeptioService,
     onOpenWebView: (token: String) -> Unit
 ) {
     val activity = LocalContext.current as MainActivity
@@ -69,6 +71,10 @@ fun MainScreen(
     }
     val shouldLoadAdd = remember {
         mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.setTargetService(targetService)
     }
 
     Scaffold(

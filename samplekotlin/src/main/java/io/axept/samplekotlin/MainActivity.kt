@@ -31,10 +31,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val targetService =
+            if (BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers") AxeptioService.PUBLISHERS_TCF
+            else AxeptioService.BRANDS
+
         setContent {
             SampleKotlinTheme {
                 val navController = rememberNavController()
-                AppNavHost(navController)
+                AppNavHost(
+                    navController = navController,
+                    targetService = targetService
+                )
             }
         }
 
@@ -44,8 +51,7 @@ class MainActivity : ComponentActivity() {
             clientId = BuildConfig.AXEPTIO_CLIENT_ID,
             cookiesVersion = BuildConfig.AXEPTIO_COOKIES_VERSION,
             token = null,
-            targetService = if (BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers") AxeptioService.PUBLISHERS_TCF
-                else AxeptioService.BRANDS
+            targetService = targetService
         )
 
         // Google consent v2 implementation
