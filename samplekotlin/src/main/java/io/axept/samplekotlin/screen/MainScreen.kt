@@ -114,6 +114,7 @@ fun MainScreen(
                     )
 
                     AxeptioButton(
+                        enabled = targetService == AxeptioService.PUBLISHERS_TCF,
                         label = "Shared consents web view",
                         onClick = {
                             showTokenInputPopup.value = true
