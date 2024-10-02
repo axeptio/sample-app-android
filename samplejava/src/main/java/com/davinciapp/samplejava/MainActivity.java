@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         Axeptio axeptio = AxeptioSDK.instance();
         axeptio.initialize(
                 MainActivity.this,
-                "5fbfa806a0787d3985c6ee5f",
-                "google cmp partner program sandbox-en-EU",
+                BuildConfig.AXEPTIO_CLIENT_ID,
+                BuildConfig.AXEPTIO_COOKIES_VERSION,
                 null
         );
         setGoogleConsent();
