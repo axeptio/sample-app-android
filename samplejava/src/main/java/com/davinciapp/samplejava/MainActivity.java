@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         adBtn.setOnClickListener(view -> loadAd());
         preferencesBtn.setOnClickListener(view -> showPreferencesDialog());
         clearConsentsBtn.setOnClickListener(view -> axeptio.clearConsents());
+        sharedConsentsUrlBtn.setEnabled(BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers");
         sharedConsentsUrlBtn.setOnClickListener(view ->
                 showTokenInputDialog()
         );
