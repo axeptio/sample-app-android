@@ -10,7 +10,7 @@ The project consists of two modules:
 
 ## Getting Started
 
-To get started with implementing the Axeptio SDK in your Android app, follow these steps:
+To get started with testing the Axeptio SDK sample apps, follow these steps:
 
 1. Clone this repository to your local machine:
 
@@ -29,6 +29,8 @@ maven {
 ```
 
 3.  Choose the appropriate sample module (samplejava or samplekotlin) based on your preferred language and UI framework.
+
+4. Choose the build variant corresponding to your need (publishers or brands). 
 
 # Axeptio SDK implementation
 
@@ -96,7 +98,8 @@ override fun onCreate(savedInstanceState: Bundle?) {
 	super.onCreate(savedInstanceState)  
   
 	AxeptioSDK.instance().initialize(  
-		activity = this@MainActivity,  
+		activity = this@MainActivity,
+        targetService = [AxeptioService.PUBLISHERS_TCF || AxeptioService.BRANDS],
 		cliendId = [your_client_id],  
 		cookiesVersion = [your_cookies_version],
 		token = [optional_consent_token]  
@@ -113,6 +116,7 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
 	Axeptio axeptio = AxeptioSDK.instance();  
 	axeptio.initialize(
 		MainActivity.this,
+        [AxeptioService.PUBLISHERS_TCF || AxeptioService.BRANDS],
 		[your_project_id],  
 		[your_configuration_id],
 		[optional_consent_token]
@@ -162,6 +166,8 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
 ```
 
 ### Sharing consents with other web views
+>*This feature is only available for **publishers** service.*
+
 The SDK provides a helper function to append the `axeptio_token` query param to any URL.
 You can precise a custom user token or use the one currently stored in the SDK.
 
