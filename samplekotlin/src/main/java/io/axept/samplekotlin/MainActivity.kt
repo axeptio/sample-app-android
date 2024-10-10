@@ -20,6 +20,7 @@ import io.axept.android.googleconsent.GoogleConsentStatus
 import io.axept.android.googleconsent.GoogleConsentType
 import io.axept.android.library.AxeptioEventListener
 import io.axept.android.library.AxeptioSDK
+import io.axept.android.library.AxeptioService
 import io.axept.samplekotlin.navigation.AppNavHost
 import io.axept.samplekotlin.screen.MainScreen
 import io.axept.samplekotlin.screen.MainViewModel
@@ -30,17 +31,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val targetService =
+            if (BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers") AxeptioService.PUBLISHERS_TCF
+            else AxeptioService.BRANDS
+
         setContent {
             SampleKotlinTheme {
                 val navController = rememberNavController()
-                AppNavHost(navController)
+                AppNavHost(
+                    navController = navController,
+                    targetService = targetService
+                )
             }
         }
 
+
         AxeptioSDK.instance().initialize(
             activity = this,
-            clientId = "5fbfa806a0787d3985c6ee5f",
-            cookiesVersion = "google cmp partner program sandbox-en-EU",
+            targetService = targetService,
+            clientId = BuildConfig.AXEPTIO_CLIENT_ID,
+            cookiesVersion = BuildConfig.AXEPTIO_COOKIES_VERSION,
             token = null
         )
 

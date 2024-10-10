@@ -89,3 +89,9 @@ enum class TCFFields(val key: String, val type: Any) {
         String
     );
 }
+
+enum class COOKIE_FIELDS(val key: String) {
+    AXEPTIO_COOKIES("axeptio_cookies"),
+    AXEPTIO_ALL_VENDORS("axeptio_all_vendors"),
+    AXEPTIO_AUTHORIZED_VENDORS("axeptio_authorized_vendors")
+}
