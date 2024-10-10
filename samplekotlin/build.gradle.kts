@@ -20,7 +20,9 @@ android {
             useSupportLibrary = true
         }
     }
+
     buildTypes {
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -28,6 +30,23 @@ android {
                 "proguard-rules.pro"
             )
 //            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        android.buildFeatures.buildConfig = true
+        flavorDimensions += listOf("service")
+        productFlavors {
+            create("publishers") {
+                dimension = "service"
+                buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
+                buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
+                buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+            }
+            create("brands") {
+                dimension = "service"
+                buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
+                buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
+                buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+            }
         }
     }
     compileOptions {
@@ -51,7 +70,7 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:sdk:1.2.0")
+    implementation("io.axept.android:android-sdk:2.0.0-dev01")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")

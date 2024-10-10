@@ -70,3 +70,21 @@ enum TCFFields {
         this.type = type;
     }
 }
+
+enum COOKIE_FIELDS {
+    AXEPTIO_COOKIES("axeptio_cookies"),
+    AXEPTIO_ALL_VENDORS("axeptio_all_vendors"),
+    AXEPTIO_AUTHORIZED_VENDORS("axeptio_authorized_vendors");
+
+    private final String key;
+
+    // Constructor
+    COOKIE_FIELDS(String key) {
+        this.key = key;
+    }
+
+    // Getter method to retrieve the key value
+    public String getKey() {
+        return key;
+    }
+}

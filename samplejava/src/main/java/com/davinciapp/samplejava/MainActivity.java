@@ -33,6 +33,7 @@ import io.axept.android.googleconsent.GoogleConsentType;
 import io.axept.android.library.Axeptio;
 import io.axept.android.library.AxeptioEventListener;
 import io.axept.android.library.AxeptioSDK;
+import io.axept.android.library.AxeptioService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -45,13 +46,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AxeptioService targetService = getAxeptioService(BuildConfig.AXEPTIO_TARGET_SERVICE);
+
         MobileAds.initialize(this);
 
         Axeptio axeptio = AxeptioSDK.instance();
         axeptio.initialize(
                 MainActivity.this,
-                "5fbfa806a0787d3985c6ee5f",
-                "google cmp partner program sandbox-en-EU",
+                targetService,
+                BuildConfig.AXEPTIO_CLIENT_ID,
+                BuildConfig.AXEPTIO_COOKIES_VERSION,
                 null
         );
         setGoogleConsent();
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
         adBtn.setOnClickListener(view -> loadAd());
         preferencesBtn.setOnClickListener(view -> showPreferencesDialog());
         clearConsentsBtn.setOnClickListener(view -> axeptio.clearConsents());
+        sharedConsentsUrlBtn.setEnabled(BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers");
         sharedConsentsUrlBtn.setOnClickListener(view ->
                 showTokenInputDialog()
         );
@@ -178,6 +183,14 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.setView(view);
         dialog.show();
+    }
+
+    private AxeptioService getAxeptioService(String id) {
+        if (id == "publishers") {
+            return AxeptioService.PUBLISHERS_TCF;
+        } else {
+            return AxeptioService.BRANDS;
+        }
     }
 
 }
