@@ -8,6 +8,8 @@ The project consists of two modules:
 - `samplejava`: Illustrates the usage of the Axeptio SDK with Java and XML.
 - `samplekotlin`: Demonstrates the integration of the Axeptio SDK with Kotlin and Compose.
 
+Each module can be build with the variant `brands` or `publishers` given your requirements.
+
 ## Getting Started
 
 To get started with testing the Axeptio SDK sample apps, follow these steps:
@@ -20,7 +22,7 @@ To get started with testing the Axeptio SDK sample apps, follow these steps:
 2. Provide your Github access token for the Axeptio SDK in the `settings.gradle.kts` project's file.
 ```kts
 maven {  
-	url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")  
+	url = uri("https://maven.pkg.github.com/axeptio/axeptio-android-sdk")  
 	credentials {  
 		username = "" // TODO: Username  
 		password = "" // TODO: Read package token  
@@ -41,6 +43,7 @@ The SDK is hosted by Github Packages.
 It supports Android SDK versions >= 26.
 
 First, add the maven repository to your *settings.gradle* file.
+The provided github token must have the scope `read:packages` enabled.
 
 **Kotlin DSL**
 ```kotlin
@@ -50,7 +53,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
+            url = uri("https://maven.pkg.github.com/axeptio/axeptio-android-sdk")
             credentials {
                username = "[GITHUB_USERNAME]"
                password = "[GITHUB_TOKEN]"
@@ -77,13 +80,13 @@ Then add the package dependency to your *build.gradle* file.
 **Kotlin DSL**
 ```kotlin
 dependencies {  
-	implementation("io.axept.android:sdk:[latest_version]")
+	implementation("io.axept.android:android-sdk:[latest_version]")
 }
 ```
 **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:sdk:[latest_version]'
+    implementation 'io.axept.android:android-sdk:[latest_version]'
 }
 ```
 
@@ -126,8 +129,9 @@ protected void onCreate(@Nullable Bundle savedInstanceState) {
 ```
 
 The consent pop up will automatically open if the user's consents are expired or haven't been registered yet.
-You can transfer a user's consents by providing his Axeptio token.
 
+> **Publishers**
+You can transfer a user's consents by providing his Axeptio token.
 The SDK will automatically update the user's SharedPreferences according to the TCFv2 [IAB documentation](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details).
 
 ## Show consent popup on demand
