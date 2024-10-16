@@ -67,7 +67,7 @@ dependencyResolutionManagement {
 ```groovy
 repositories {
     maven {
-        url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
+        url = uri("https://maven.pkg.github.com/axeptio/axeptio-android-sdk")
         credentials {
            username = "[GITHUB_USERNAME]"
            password = "[GITHUB_TOKEN]"
@@ -80,13 +80,13 @@ Then add the package dependency to your *build.gradle* file.
 **Kotlin DSL**
 ```kotlin
 dependencies {  
-	implementation("io.axept.android:android-sdk:[latest_version]")
+	implementation("io.axept.android:android-sdk:2.0.0")
 }
 ```
 **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:[latest_version]'
+    implementation 'io.axept.android:android-sdk:2.0.0'
 }
 ```
 
