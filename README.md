@@ -93,7 +93,7 @@ dependencies {
 For more details, you can refer to the [Github documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package).
 
 ## Initialize the SDK
-Initialize the SDK inside the onCreate() of your main activity.
+Initialize the SDK inside the onCreate() of your main activity. You can configure the SDK for brands or publishers via the AxeptioService enum during initialization.
 
 **Kotlin**
 ```kotlin
@@ -133,6 +133,22 @@ The consent pop up will automatically open if the user's consents are expired or
 > **Publishers**
 You can transfer a user's consents by providing his Axeptio token.
 The SDK will automatically update the user's SharedPreferences according to the TCFv2 [IAB documentation](https://github.com/InteractiveAdvertisingBureau/GDPR-Transparency-and-Consent-Framework/blob/master/TCFv2/IAB%20Tech%20Lab%20-%20CMP%20API%20v2.md#in-app-details).
+
+## Responsibilities: Mobile App vs SDK
+
+The Axeptio SDK and your mobile application have distinct responsibilities in managing user consent and tracking:
+
+### Mobile Application Responsibilities:
+- Handling SDK events and updating app behavior based on user consent
+
+### Axeptio SDK Responsibilities:
+- Displaying the consent management platform (CMP) interface
+- Managing and storing user consent choices
+- Sending consent status through APIs
+
+## Get stored consents
+
+You can retrieve the consents that are stored by the SDK in SharedPreferences.
 
 ## Show consent popup on demand
 
