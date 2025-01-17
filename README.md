@@ -150,6 +150,13 @@ The Axeptio SDK and your mobile application have distinct responsibilities in ma
 
 You can retrieve the consents that are stored by the SDK in SharedPreferences.
 
+```
+val sharedPref = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+val value = sharedPref.getString("key", "default_value")
+```
+
+For detailed information about stored values and cookies, please refer to the [Axeptio documentation](https://support.axeptio.eu/hc/en-gb/articles/8558526367249-Does-Axeptio-deposit-cookies).
+
 ## Show consent popup on demand
 
 Additionally, you can request the consent popup to open on demand.
