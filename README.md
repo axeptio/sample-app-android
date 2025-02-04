@@ -80,13 +80,13 @@ Then add the package dependency to your *build.gradle* file.
 **Kotlin DSL**
 ```kotlin
 dependencies {  
-	implementation("io.axept.android:android-sdk:2.0.1")
+	implementation("io.axept.android:android-sdk:2.0.2")
 }
 ```
 **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.0.1'
+    implementation 'io.axept.android:android-sdk:2.0.2'
 }
 ```
 
