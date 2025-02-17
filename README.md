@@ -80,20 +80,21 @@ Then add the package dependency to your *build.gradle* file.
 **Kotlin DSL**
 ```kotlin
 dependencies {  
-	implementation("io.axept.android:android-sdk:2.0.2")
+	implementation("io.axept.android:android-sdk:2.0.3")
 }
 ```
 **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.0.2'
+    implementation 'io.axept.android:android-sdk:2.0.3'
 }
 ```
 
 For more details, you can refer to the [Github documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package).
 
 ## Initialize the SDK
-Initialize the SDK inside the onCreate() of your main activity. You can configure the SDK for brands or publishers via the AxeptioService enum during initialization.
+Initialize the SDK inside the onCreate() of your main activity. This must be called before any other axeptio sdk function.
+You can configure the SDK for brands or publishers via the AxeptioService enum during initialization.
 
 **Kotlin**
 ```kotlin
@@ -213,6 +214,8 @@ Will return `https://myurl.com?axeptio_token=[token]`
 ```kotlin
 AxeptioSDK.instance().clearConsents()
 ```
+
+Clearing consent runs asynchronously, use the ```AxeptioEventListener.onConsentCleared()``` to know when user consents have been cleared from the shared preferences.
 
 ## Google Consent v2
 
