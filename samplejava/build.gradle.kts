@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.davinciapp.samplejava"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.davinciapp.samplejava"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:android-sdk:2.0.4")
+    implementation("io.axept.android:android-sdk:2.0.5")
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
     implementation("com.google.firebase:firebase-analytics")
