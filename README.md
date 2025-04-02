@@ -232,16 +232,7 @@ The integration of the Axeptio SDK into your mobile application involves clear d
 ## Responsibilities: Mobile App vs SDK
 #### **Mobile Application Responsibilities:**
 
-1. **Managing App Tracking Transparency (ATT) Flow:**
-   - The mobile app is responsible for initiating and managing the ATT authorization process on iOS 14 and later. This includes presenting the ATT request prompt at an appropriate time in the app's lifecycle.
-
-2. **Controlling the Display Sequence of ATT and CMP:**
-   - The app must determine the appropriate sequence for displaying the ATT prompt and the Axeptio consent management platform (CMP). Specifically, the app should request ATT consent before invoking the Axeptio CMP.
-
-3. **Compliance with App Store Privacy Labels:**
-   - The app must ensure accurate and up-to-date declarations of data collection practices according to Apple’s privacy label requirements, ensuring full transparency to users about data usage.
-
-4. **Event Handling and User Consent Updates:**
+- **Event Handling and User Consent Updates:**
    - The app is responsible for handling SDK events such as user consent actions. Based on these events, the app must adjust its behavior accordingly, ensuring that user consent is respected across sessions.
 
 #### **Axeptio SDK Responsibilities:**
@@ -255,8 +246,6 @@ The integration of the Axeptio SDK into your mobile application involves clear d
 3. **Sending Consent Status via APIs:**
    - The SDK facilitates communication of the user's consent status through APIs, allowing the app to be updated with the user’s preferences.
 
-4. **No Implicit Handling of ATT Permissions:**
-   - The Axeptio SDK does **not** manage the App Tracking Transparency (ATT) permission flow. It is the host app's responsibility to request and handle ATT permissions explicitly before displaying the consent management interface. The SDK functions only once the ATT permission is granted (or bypassed due to platform restrictions).
 <br><br><br>
 
 ## 🔑Get Stored Consents
