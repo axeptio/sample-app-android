@@ -46,6 +46,10 @@ First, clone the repository to your local development environment:
 git clone https://github.com/axeptio/sample-app-android
 ```
 ##### Configure your Github access token
+> 🛡️ Maven requires authentication to access private repositories such as GitHub Packages.
+> Without valid credentials (GitHub username and token), Gradle will not be able to download dependencies and will return a 401 Unauthorized error.
+> The following steps explain how to create a Personal Access Token and configure Gradle to use it securely via environment variables.
+
 To properly configure access to the Axeptio SDK, you need to add your GitHub token in the `settings.gradle.kts` file to fetch the SDK from the private repository. The library is not available on a public Maven repository, so it is crucial to configure the private repository correctly to avoid errors. You can also consider publishing the Axeptio SDK to a public repository to simplify integration, reducing the process complexity. Here’s how to configure the private repository in the `settings.gradle.kts` file:
 ```kotin
 maven {
@@ -56,6 +60,38 @@ maven {
     }
 }
 ```
+
+You can avoid hardcoding credentials by using environment variables instead of directly writing your GitHub username and token in the file. This is more secure and avoids leaking sensitive information.
+To do this, replace the static strings with calls to environment variables using `System.getenv()` as follows:
+```kotlin
+credentials {
+    username = System.getenv("GITHUB_USERNAME")
+    password = System.getenv("GITHUB_TOKEN")
+}
+```
+If you haven't already created a GitHub Personal Access Token (PAT), you can do so by:
+1. Going [here](https://github.com/settings/tokens)
+2. Clicking on "Generate new token (classic)"
+3. Giving it a name and expiration
+4. Selecting the `read:packages` scope
+5. Generating and copying the token (you will not be able to see it again)
+
+Once you have the token, export it as environment variables
+- On macOS/Linux (e.g., in `.bashrc`, `.zshrc`, or shell session):
+  ```bash
+  export GITHUB_USERNAME="your-github-username"
+  export GITHUB_TOKEN="your-personal-access-token"
+  ```
+- On Windows (CMD):
+  ```cmd
+  setx GITHUB_USERNAME "your-github-username"
+  setx GITHUB_TOKEN "your-personal-access-token"
+  ```
+After doing this, Gradle will automatically pick them up when resolving dependencies.
+
+
+
+
 ##### Ensure Proper Configuration in Axeptio Backoffice
 Before proceeding with the integration, ensure that your project is correctly configured in the Axeptio backoffice. Specifically, verify that your clientId and configurationId are set up correctly. This is critical for the SDK to function as expected. If these values are not correctly configured, the SDK will not initialize properly, leading to errors during integration.
 
