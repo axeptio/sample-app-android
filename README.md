@@ -14,15 +14,17 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 ## 📑 Table of Contents
 1. [Overview](#overview)
 2. [Getting Started](#getting-started)
-3. [Axeptio SDK Implementation](#axeptio-sdk-implementation)
-4. [Initialize the SDK](#initialize-the-sdk)
-5. [Responsibilities: Mobile App vs SDK](#responsibilities-mobile-app-vs-sdk)
-6. [Get Stored Consents](#get-stored-consents)
-7. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
-8. [Popup Events](#popup-events)
-9. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
-10. [Clear User's Consent Choices](#clear-users-consent-choices)
-11. [Google Consent v2](#google-consent-v2)
+3. [Local Testing with Production Widget Configuration](#local-testing-with-production-widget-configuration)
+4. [Switching Between Publisher and Brand Flavors](#switching-between-publisher-and-brand-flavors)
+5. [Axeptio SDK Implementation](#axeptio-sdk-implementation)
+6. [Initialize the SDK](#initialize-the-sdk)
+7. [Responsibilities: Mobile App vs SDK](#responsibilities-mobile-app-vs-sdk)
+8. [Get Stored Consents](#get-stored-consents)
+9. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
+10. [Popup Events](#popup-events)
+11. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
+12. [Clear User's Consent Choices](#clear-users-consent-choices)
+13. [Google Consent v2](#google-consent-v2)
 
 
 <br><br>
@@ -108,7 +110,66 @@ Depending on your use case, select the appropriate build variant:
 - **brands**
 
 <br><br><br>
+## Local Testing with Production Widget Configuration
+To test SDK changes using a cookie configuration from the production backoffice, follow these steps:
+1. Checkout the `axeptio-android-sdk-sources` repository and switch to the branch you need to test.
+2. Configure the widget as described in the configuration section.
 
+To test the version currently in production, instead checkout the `sample-app-android repository`, configure the widget, and in `build.gradle.kts` set the desired SDK version, for example: 
+```gradle
+implementation("io.axept.android:android-sdk:2.0.6")
+```
+To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
+```kotin
+productFlavors {
+    create("publishers") {
+        dimension = "service"
+        buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"67b63ac7d81d22bf09c09e52\"")
+        buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"tcf-consent-mode\"")
+        buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+    }
+    create("brands") {
+        dimension = "service"
+        buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"67f3f816b336596c4a7c741c\"")
+        buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"demo-en-EU\"")
+        buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+    }
+}
+```
+Use the *Build Variants* tab to switch between brands and publishers as needed. Finally, make sure your `settings.gradle.kts` includes your GitHub credentials for accessing the SDK:
+```kotin
+maven {
+    url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
+    credentials {
+        username = "USER" // TODO: GITHUB USERNAME
+        password = "TOKEN" // TODO: GITHUB TOKEN
+    }
+}
+```
+
+<br><br><br>
+## 🔀Switching Between Publisher and Brand Flavors
+The Axeptio SDK provides two build flavors: `publishers` and `brands`. You can switch between them depending on your project needs. Each flavor activates specific behavior in the SDK.
+#### In Android Studio:
+1. Locate the *"Build Variants"* tab (usually in the lower-left corner of the IDE).
+2. If it's not visible, go to *View > Tool Windows > Build Variants* to enable it.
+3. In the Module column, select either `publishersDebug` or `brandsDebug` from the dropdown.
+
+Use Gradle commands to build a specific variant:
+```gradle
+./gradlew assemblePublishersDebug
+```
+or
+```gradle
+./gradlew assembleBrandsDebug
+```
+Make sure to clean the project if you switch flavors often:
+```bash
+./gradlew clean
+```
+
+
+<br><br><br>
 ## 💻Axeptio SDK Implementation
 The Axeptio SDK provides consent management functionality for Android applications, enabling seamless integration for handling user consent.
 
@@ -164,13 +225,13 @@ After adding the repository, include the Axeptio SDK as a dependency in your pro
  - **Kotlin DSL**
 ```kotlin
 dependencies {  
-    implementation("io.axept.android:android-sdk:2.0.3")
+    implementation("io.axept.android:android-sdk:2.0.6")
 }
 ```
  - **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.0.3'
+    implementation 'io.axept.android:android-sdk:2.0.6'
 }
 ```
 For more detailed instructions, refer to the [GitHub Documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package)
