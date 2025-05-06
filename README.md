@@ -14,15 +14,17 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 ## 📑 Table of Contents
 1. [Overview](#overview)
 2. [Getting Started](#getting-started)
-3. [Axeptio SDK Implementation](#axeptio-sdk-implementation)
-4. [Initialize the SDK](#initialize-the-sdk)
-5. [Responsibilities: Mobile App vs SDK](#responsibilities-mobile-app-vs-sdk)
-6. [Get Stored Consents](#get-stored-consents)
-7. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
-8. [Popup Events](#popup-events)
-9. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
-10. [Clear User's Consent Choices](#clear-users-consent-choices)
-11. [Google Consent v2](#google-consent-v2)
+3. [Local Testing with Production Widget Configuration](#local-testing-with-production-widget-configuration)
+4. [Switching Between Publisher and Brand Flavors](#switching-between-publisher-and-brand-flavors)
+5. [Axeptio SDK Implementation](#axeptio-sdk-implementation)
+6. [Initialize the SDK](#initialize-the-sdk)
+7. [Responsibilities: Mobile App vs SDK](#responsibilities-mobile-app-vs-sdk)
+8. [Get Stored Consents](#get-stored-consents)
+9. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
+10. [Popup Events](#popup-events)
+11. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
+12. [Clear User's Consent Choices](#clear-users-consent-choices)
+13. [Google Consent v2](#google-consent-v2)
 
 
 <br><br>
@@ -46,6 +48,10 @@ First, clone the repository to your local development environment:
 git clone https://github.com/axeptio/sample-app-android
 ```
 ##### Configure your Github access token
+> 🛡️ Maven requires authentication to access private repositories such as GitHub Packages.
+> Without valid credentials (GitHub username and token), Gradle will not be able to download dependencies and will return a 401 Unauthorized error.
+> The following steps explain how to create a Personal Access Token and configure Gradle to use it securely via environment variables.
+
 To properly configure access to the Axeptio SDK, you need to add your GitHub token in the `settings.gradle.kts` file to fetch the SDK from the private repository. The library is not available on a public Maven repository, so it is crucial to configure the private repository correctly to avoid errors. You can also consider publishing the Axeptio SDK to a public repository to simplify integration, reducing the process complexity. Here’s how to configure the private repository in the `settings.gradle.kts` file:
 ```kotin
 maven {
@@ -56,6 +62,38 @@ maven {
     }
 }
 ```
+
+You can avoid hardcoding credentials by using environment variables instead of directly writing your GitHub username and token in the file. This is more secure and avoids leaking sensitive information.
+To do this, replace the static strings with calls to environment variables using `System.getenv()` as follows:
+```kotlin
+credentials {
+    username = System.getenv("GITHUB_USERNAME")
+    password = System.getenv("GITHUB_TOKEN")
+}
+```
+If you haven't already created a GitHub Personal Access Token (PAT), you can do so by:
+1. Going [here](https://github.com/settings/tokens)
+2. Clicking on "Generate new token (classic)"
+3. Giving it a name and expiration
+4. Selecting the `read:packages` scope
+5. Generating and copying the token (you will not be able to see it again)
+
+Once you have the token, export it as environment variables
+- On macOS/Linux (e.g., in `.bashrc`, `.zshrc`, or shell session):
+  ```bash
+  export GITHUB_USERNAME="your-github-username"
+  export GITHUB_TOKEN="your-personal-access-token"
+  ```
+- On Windows (CMD):
+  ```cmd
+  setx GITHUB_USERNAME "your-github-username"
+  setx GITHUB_TOKEN "your-personal-access-token"
+  ```
+After doing this, Gradle will automatically pick them up when resolving dependencies.
+
+
+
+
 ##### Ensure Proper Configuration in Axeptio Backoffice
 Before proceeding with the integration, ensure that your project is correctly configured in the Axeptio backoffice. Specifically, verify that your clientId and configurationId are set up correctly. This is critical for the SDK to function as expected. If these values are not correctly configured, the SDK will not initialize properly, leading to errors during integration.
 
@@ -72,7 +110,66 @@ Depending on your use case, select the appropriate build variant:
 - **brands**
 
 <br><br><br>
+## Local Testing with Production Widget Configuration
+To test SDK changes using a cookie configuration from the production backoffice, follow these steps:
+1. Checkout the `axeptio-android-sdk-sources` repository and switch to the branch you need to test.
+2. Configure the widget as described in the configuration section.
 
+To test the version currently in production, instead checkout the `sample-app-android repository`, configure the widget, and in `build.gradle.kts` set the desired SDK version, for example: 
+```gradle
+implementation("io.axept.android:android-sdk:2.0.6")
+```
+To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
+```kotin
+productFlavors {
+    create("publishers") {
+        dimension = "service"
+        buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"67b63ac7d81d22bf09c09e52\"")
+        buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"tcf-consent-mode\"")
+        buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+    }
+    create("brands") {
+        dimension = "service"
+        buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"67f3f816b336596c4a7c741c\"")
+        buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"demo-en-EU\"")
+        buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+    }
+}
+```
+Use the *Build Variants* tab to switch between brands and publishers as needed. Finally, make sure your `settings.gradle.kts` includes your GitHub credentials for accessing the SDK:
+```kotin
+maven {
+    url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
+    credentials {
+        username = "USER" // TODO: GITHUB USERNAME
+        password = "TOKEN" // TODO: GITHUB TOKEN
+    }
+}
+```
+
+<br><br><br>
+## 🔀Switching Between Publisher and Brand Flavors
+The Axeptio SDK provides two build flavors: `publishers` and `brands`. You can switch between them depending on your project needs. Each flavor activates specific behavior in the SDK.
+#### In Android Studio:
+1. Locate the *"Build Variants"* tab (usually in the lower-left corner of the IDE).
+2. If it's not visible, go to *View > Tool Windows > Build Variants* to enable it.
+3. In the Module column, select either `publishersDebug` or `brandsDebug` from the dropdown.
+
+Use Gradle commands to build a specific variant:
+```gradle
+./gradlew assemblePublishersDebug
+```
+or
+```gradle
+./gradlew assembleBrandsDebug
+```
+Make sure to clean the project if you switch flavors often:
+```bash
+./gradlew clean
+```
+
+
+<br><br><br>
 ## 💻Axeptio SDK Implementation
 The Axeptio SDK provides consent management functionality for Android applications, enabling seamless integration for handling user consent.
 
@@ -128,13 +225,13 @@ After adding the repository, include the Axeptio SDK as a dependency in your pro
  - **Kotlin DSL**
 ```kotlin
 dependencies {  
-    implementation("io.axept.android:android-sdk:2.0.3")
+    implementation("io.axept.android:android-sdk:2.0.6")
 }
 ```
  - **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.0.3'
+    implementation 'io.axept.android:android-sdk:2.0.6'
 }
 ```
 For more detailed instructions, refer to the [GitHub Documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package)
