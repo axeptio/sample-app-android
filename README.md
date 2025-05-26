@@ -96,11 +96,13 @@ After doing this, Gradle will automatically pick them up when resolving dependen
 For local testing without real Google services
 
 ```export GOOGLE_PROJECT=demo-project-12345
-export GOOGLE_API_KEY=AIzaSyDemoKey1234567890abcdefghijklmnop```
+export GOOGLE_API_KEY=AIzaSyDemoKey1234567890abcdefghijklmnop
+ ```
 
 and then run 
 
-```generate-config.sh```
+```generate-config.sh
+```
 
 
 ##### Ensure Proper Configuration in Axeptio Backoffice
