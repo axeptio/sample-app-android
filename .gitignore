@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+samplejava/google-services.json
+samplekotlin/google-services.json
