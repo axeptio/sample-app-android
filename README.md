@@ -212,10 +212,10 @@ dependencyResolutionManagement {
             // Configure credentials for accessing the GitHub Packages repository
             credentials {
                 // Provide your GitHub username here
-                username = "[GITHUB_USERNAME]"
+                username = System.getenv("GITHUB_ACTOR")
                 
                 // Provide your GitHub token here, ensuring the 'read:packages' scope is enabled
-                password = "[GITHUB_TOKEN]"
+                password = System.getenv("GITHUB_TOKEN")
             }
         }
     }
