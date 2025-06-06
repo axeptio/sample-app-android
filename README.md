@@ -22,9 +22,10 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 8. [Get Stored Consents](#get-stored-consents)
 9. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
 10. [Popup Events](#popup-events)
-11. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
-12. [Clear User's Consent Choices](#clear-users-consent-choices)
-13. [Google Consent v2](#google-consent-v2)
+11. [Event source for KPI tracking](#event-source-for-kpi-tracking)
+12. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
+13. [Clear User's Consent Choices](#clear-users-consent-choices)
+14. [Google Consent v2](#google-consent-v2)
 
 
 <br><br>
@@ -413,6 +414,21 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
     }
 });
 ```
+<br><br><br>
+## Event source for KPI tracking
+To ensure proper KPI attribution in the back office, the App SDK now adds a specific `event_source` value when emitting TCF events from the WebView.
+
+- `sdk-app-tcf` → Used when TCF is loaded in a mobile app (via WebView)
+- `sdk-web-tcf` → Used when TCF is loaded on a website
+- `sdk-app-brands` → Used when the brands widget is loaded in an app
+- `sdk-web` → Used for regular brands on the web
+
+> ⚠️ This change ensures that events triggered from the App SDK are not incorrectly counted under Web KPIs.
+
+No additional configuration is needed on your side if you are using the official SDK integration.
+
+
+
 <br><br><br>
 ## Sharing Consents with Other Web Views
 This feature is available exclusively for **Publishers** service.
