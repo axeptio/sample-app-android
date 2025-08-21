@@ -258,17 +258,14 @@ To initialize the Axeptio SDK, you must call the initialization method inside th
 override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     
-    // Check if the SDK is already initialized to prevent multiple initializations
-    if (!AxeptioSDK.instance().isInitialized()) {
-        // Initialize the Axeptio SDK with the required configuration
-        AxeptioSDK.instance().initialize(
-            activity = this@MainActivity,  // Context of the current activity
-            targetService = AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
-            clientId = "your_client_id",  // Replace with your actual client ID
-            cookiesVersion = "your_cookies_version",  // Specify the version of cookies management
-            token = "optional_consent_token"  // Optional: Provide an existing consent token if available
-        )
-    }
+    // Initialize the Axeptio SDK with the required configuration
+    AxeptioSDK.instance().initialize(
+        activity = this@MainActivity,  // Context of the current activity
+        targetService = AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
+        clientId = "your_client_id",  // Replace with your actual client ID
+        cookiesVersion = "your_cookies_version",  // Specify the version of cookies management
+        token = "optional_consent_token"  // Optional: Provide an existing consent token if available
+    )
 }
 ```
 ##### Java Implementation
@@ -277,18 +274,15 @@ override fun onCreate(savedInstanceState: Bundle?) {
 protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     
-    // Check if the SDK is already initialized to prevent multiple initializations
-    if (!AxeptioSDK.instance().isInitialized()) {
-        // Initialize the Axeptio SDK with the required configuration
-        Axeptio axeptio = AxeptioSDK.instance();
-        axeptio.initialize(
-            MainActivity.this,  // Context of the current activity
-            AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
-            "your_project_id",  // Replace with your actual project ID
-            "your_configuration_id",  // Provide your configuration ID
-            "optional_consent_token"  // Optional: Provide an existing consent token if available
-        );
-    }
+    // Initialize the Axeptio SDK with the required configuration
+    Axeptio axeptio = AxeptioSDK.instance();
+    axeptio.initialize(
+        MainActivity.this,  // Context of the current activity
+        AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
+        "your_project_id",  // Replace with your actual project ID
+        "your_configuration_id",  // Provide your configuration ID
+        "optional_consent_token"  // Optional: Provide an existing consent token if available
+    );
 }
 ```
 ##### Consent Popup Behavior
