@@ -22,9 +22,10 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 8. [Get Stored Consents](#get-stored-consents)
 9. [Show Consent Popup on Demand](#show-consent-popup-on-demand)
 10. [Popup Events](#popup-events)
-11. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
-12. [Clear User's Consent Choices](#clear-users-consent-choices)
-13. [Google Consent v2](#google-consent-v2)
+11. [Event source for KPI tracking](#event-source-for-kpi-tracking)
+12. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
+13. [Clear User's Consent Choices](#clear-users-consent-choices)
+14. [Google Consent v2](#google-consent-v2)
 
 
 <br><br>
@@ -258,17 +259,14 @@ To initialize the Axeptio SDK, you must call the initialization method inside th
 override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     
-    // Check if the SDK is already initialized to prevent multiple initializations
-    if (!AxeptioSDK.instance().isInitialized()) {
-        // Initialize the Axeptio SDK with the required configuration
-        AxeptioSDK.instance().initialize(
-            activity = this@MainActivity,  // Context of the current activity
-            targetService = AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
-            clientId = "your_client_id",  // Replace with your actual client ID
-            cookiesVersion = "your_cookies_version",  // Specify the version of cookies management
-            token = "optional_consent_token"  // Optional: Provide an existing consent token if available
-        )
-    }
+    // Initialize the Axeptio SDK with the required configuration
+    AxeptioSDK.instance().initialize(
+        activity = this@MainActivity,  // Context of the current activity
+        targetService = AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
+        clientId = "your_client_id",  // Replace with your actual client ID
+        cookiesVersion = "your_cookies_version",  // Specify the version of cookies management
+        token = "optional_consent_token"  // Optional: Provide an existing consent token if available
+    )
 }
 ```
 ##### Java Implementation
@@ -277,18 +275,15 @@ override fun onCreate(savedInstanceState: Bundle?) {
 protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     
-    // Check if the SDK is already initialized to prevent multiple initializations
-    if (!AxeptioSDK.instance().isInitialized()) {
-        // Initialize the Axeptio SDK with the required configuration
-        Axeptio axeptio = AxeptioSDK.instance();
-        axeptio.initialize(
-            MainActivity.this,  // Context of the current activity
-            AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
-            "your_project_id",  // Replace with your actual project ID
-            "your_configuration_id",  // Provide your configuration ID
-            "optional_consent_token"  // Optional: Provide an existing consent token if available
-        );
-    }
+    // Initialize the Axeptio SDK with the required configuration
+    Axeptio axeptio = AxeptioSDK.instance();
+    axeptio.initialize(
+        MainActivity.this,  // Context of the current activity
+        AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
+        "your_project_id",  // Replace with your actual project ID
+        "your_configuration_id",  // Provide your configuration ID
+        "optional_consent_token"  // Optional: Provide an existing consent token if available
+    );
 }
 ```
 ##### Consent Popup Behavior
@@ -413,6 +408,21 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
     }
 });
 ```
+<br><br><br>
+## Event source for KPI tracking
+To ensure proper KPI attribution in the back office, the App SDK now adds a specific `event_source` value when emitting TCF events from the WebView.
+
+- `sdk-app-tcf` → Used when TCF is loaded in a mobile app (via WebView)
+- `sdk-web-tcf` → Used when TCF is loaded on a website
+- `sdk-app-brands` → Used when the brands widget is loaded in an app
+- `sdk-web` → Used for regular brands on the web
+
+> ⚠️ This change ensures that events triggered from the App SDK are not incorrectly counted under Web KPIs.
+
+No additional configuration is needed on your side if you are using the official SDK integration.
+
+
+
 <br><br><br>
 ## Sharing Consents with Other Web Views
 This feature is available exclusively for **Publishers** service.
