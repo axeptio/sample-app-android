@@ -47,6 +47,7 @@ import io.axept.samplekotlin.TAG
 import io.axept.samplekotlin.ui.theme.Red
 import io.axept.samplekotlin.ui.theme.Yellow
 import io.axept.samplekotlin.config.ConfigurationManager
+import io.axept.samplekotlin.BuildConfig
 
 @Composable
 fun MainScreen(
@@ -87,6 +88,7 @@ fun MainScreen(
         topBar = {
             AxeptioTopBar(
                 serviceName = configManager.currentServiceDisplayName,
+                sdkVersion = BuildConfig.AXEPTIO_SDK_VERSION,
                 onConfigurationClick = onNavigateToConfiguration
             )
         }
@@ -197,6 +199,7 @@ fun MainScreen(
 @Composable
 internal fun AxeptioTopBar(
     serviceName: String = "",
+    sdkVersion: String = "",
     onConfigurationClick: () -> Unit = {}
 ) {
     TopAppBar(
@@ -209,6 +212,13 @@ internal fun AxeptioTopBar(
                 if (serviceName.isNotEmpty()) {
                     Text(
                         text = "Service: $serviceName",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (sdkVersion.isNotEmpty()) {
+                    Text(
+                        text = "SDK: $sdkVersion",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

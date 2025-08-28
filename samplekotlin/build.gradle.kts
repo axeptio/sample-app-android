@@ -40,12 +40,14 @@ android {
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
             create("brands") {
                 dimension = "service"
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
         }
     }
