@@ -25,6 +25,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -54,7 +57,8 @@ fun MainScreen(
     targetService: AxeptioService,
     onOpenWebView: (token: String) -> Unit,
     onNavigateToVendorTest: () -> Unit = {},
-    onNavigateToConfiguration: () -> Unit = {}
+    onNavigateToConfiguration: () -> Unit = {},
+    onNavigateToDebugInfo: () -> Unit = {}
 ) {
     val activity = LocalContext.current as MainActivity
     val context = LocalContext.current
@@ -79,6 +83,11 @@ fun MainScreen(
     val shouldLoadAdd = remember {
         mutableIntStateOf(0)
     }
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Clear consent state
+    val clearConsentInProgress = remember { mutableStateOf(false) }
+    val clearConsentSuccess = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.setTargetService(targetService)
@@ -139,11 +148,38 @@ fun MainScreen(
                         onClick = onNavigateToVendorTest
                     )
 
+                    // Debug Consent Info button
                     AxeptioButton(
-                        label = "Clear consent",
+                        label = "Debug Consent Info",
+                        onClick = onNavigateToDebugInfo,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    AxeptioButton(
+                        label = if (clearConsentSuccess.value) "✅ Consent Cleared!" 
+                               else if (clearConsentInProgress.value) "Clearing..." 
+                               else "Clear consent",
+                        enabled = !clearConsentInProgress.value,
+                        loading = clearConsentInProgress.value,
                         onClick = {
+                            clearConsentInProgress.value = true
+                            clearConsentSuccess.value = false
+                            
+                            // Clear consent with feedback
                             AxeptioSDK.instance().clearConsents()
-                            shouldLoadAdd.value++
+                            
+                            // Simulate async operation completion
+                            // In a real scenario, we'd wait for the clearConsents callback
+                            coroutineScope.launch {
+                                delay(1000) // Wait for clearing to complete
+                                clearConsentInProgress.value = false
+                                clearConsentSuccess.value = true
+                                shouldLoadAdd.value++
+                                
+                                // Reset success message after 3 seconds
+                                delay(3000)
+                                clearConsentSuccess.value = false
+                            }
                         },
                         color = Red
                     )

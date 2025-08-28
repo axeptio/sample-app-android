@@ -20,6 +20,10 @@ object ConfigurationDestination : Destination {
     override val route = "configuration_screen"
 }
 
+object DebugConsentInfoDestination : Destination {
+    override val route = "debug_consent_info_screen"
+}
+
 internal enum class ScreenArguments(val slug: String) {
     TOKEN("token")
 }

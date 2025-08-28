@@ -11,6 +11,7 @@ import io.axept.samplekotlin.screen.MainScreen
 import io.axept.samplekotlin.screen.WebViewScreen
 import io.axept.samplekotlin.screen.VendorConsentTestScreen
 import io.axept.samplekotlin.screen.ConfigurationScreen
+import io.axept.samplekotlin.screen.DebugConsentInfoScreen
 
 @Composable
 internal fun AppNavHost(navController: NavHostController, targetService: AxeptioService) {
@@ -28,6 +29,9 @@ internal fun AppNavHost(navController: NavHostController, targetService: Axeptio
                 },
                 onNavigateToConfiguration = {
                     navController.navigate(ConfigurationDestination.route)
+                },
+                onNavigateToDebugInfo = {
+                    navController.navigate(DebugConsentInfoDestination.route)
                 }
             )
         }
@@ -55,6 +59,12 @@ internal fun AppNavHost(navController: NavHostController, targetService: Axeptio
         composable(route = ConfigurationDestination.route) {
             ConfigurationScreen(
                 onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(route = DebugConsentInfoDestination.route) {
+            DebugConsentInfoScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }
