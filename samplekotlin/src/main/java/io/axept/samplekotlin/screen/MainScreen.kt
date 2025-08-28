@@ -46,13 +46,19 @@ import io.axept.samplekotlin.MainActivity
 import io.axept.samplekotlin.TAG
 import io.axept.samplekotlin.ui.theme.Red
 import io.axept.samplekotlin.ui.theme.Yellow
+import io.axept.samplekotlin.config.ConfigurationManager
 
 @Composable
 fun MainScreen(
     targetService: AxeptioService,
-    onOpenWebView: (token: String) -> Unit
+    onOpenWebView: (token: String) -> Unit,
+    onNavigateToVendorTest: () -> Unit = {},
+    onNavigateToConfiguration: () -> Unit = {}
 ) {
     val activity = LocalContext.current as MainActivity
+    val context = LocalContext.current
+    val configManager = remember { ConfigurationManager.getInstance(context) }
+    val currentConfig = configManager.currentConfiguration
     val viewModel: MainViewModel =
         viewModel(factory = MainViewModel.Companion.Factory(activity.application))
 
@@ -79,7 +85,10 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            AxeptioTopBar()
+            AxeptioTopBar(
+                serviceName = configManager.currentServiceDisplayName,
+                onConfigurationClick = onNavigateToConfiguration
+            )
         }
     ) { innerPadding ->
         Surface(
@@ -119,6 +128,13 @@ fun MainScreen(
                         onClick = {
                             showTokenInputPopup.value = true
                         }
+                    )
+
+                    // New TCF Vendor API Testing button (only for TCF service)
+                    AxeptioButton(
+                        label = "TCF Vendor API Test",
+                        enabled = currentConfig.targetService == AxeptioService.PUBLISHERS_TCF,
+                        onClick = onNavigateToVendorTest
                     )
 
                     AxeptioButton(
@@ -179,14 +195,36 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun AxeptioTopBar() {
+internal fun AxeptioTopBar(
+    serviceName: String = "",
+    onConfigurationClick: () -> Unit = {}
+) {
     TopAppBar(
         title = {
-            Text(
-                text = "Axeptio | Kotlin Sample",
-                style = MaterialTheme.typography.headlineMedium
-            )
+            Column {
+                Text(
+                    text = "Axeptio | Kotlin Sample",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                if (serviceName.isNotEmpty()) {
+                    Text(
+                        text = "Service: $serviceName",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         },
+        actions = {
+            Button(
+                onClick = onConfigurationClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Text("Config")
+            }
+        }
     )
 }
 

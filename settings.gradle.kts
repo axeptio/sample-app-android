@@ -23,3 +23,7 @@ dependencyResolutionManagement {
 rootProject.name = "sample-app-android"
 include(":samplekotlin")
 include(":samplejava")
+
+// Include local SDK sources for development
+include(":android")
+project(":android").projectDir = File("../axeptio-android-sdk-sources/android")

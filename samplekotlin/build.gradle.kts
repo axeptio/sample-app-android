@@ -70,7 +70,9 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:android-sdk:2.0.6")
+    // Use local SDK sources for development
+    implementation(project(":android"))
+    // implementation("io.axept.android:android-sdk:2.0.6") // Commented for local development
 
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
