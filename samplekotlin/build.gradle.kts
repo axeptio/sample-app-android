@@ -72,9 +72,14 @@ android {
 }
 
 dependencies {
-    // Use local SDK sources for development
-    implementation(project(":android"))
-    // implementation("io.axept.android:android-sdk:2.0.6") // Commented for local development
+    // Use local SDK sources for development, published SDK for CI
+    if (project.findProject(":android") != null) {
+        // Local development with SDK sources
+        implementation(project(":android"))
+    } else {
+        // CI/CD or production builds - use published SDK
+        implementation("io.axept.android:android-sdk:2.0.8")
+    }
 
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
