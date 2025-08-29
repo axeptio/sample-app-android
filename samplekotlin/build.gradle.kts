@@ -2,7 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
-    id("org.owasp.dependencycheck")
+    // OWASP dependency check removed - using Dependabot for vulnerability scanning
+    // id("org.owasp.dependencycheck")
 }
 
 android {

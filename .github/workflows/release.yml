@@ -64,12 +64,13 @@ jobs:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run security vulnerability scan
-        run: |
-          ./gradlew dependencyCheckAnalyze --stacktrace
-        env:
-          GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Security vulnerability scan removed - using Dependabot instead
+      # - name: Run security vulnerability scan
+      #   run: |
+      #     ./gradlew dependencyCheckAnalyze --stacktrace
+      #   env:
+      #     GITHUB_USERNAME: ${{ github.actor }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build debug variants
         run: |
@@ -96,14 +97,15 @@ jobs:
             **/build/reports/lint-results*.html
             **/build/reports/lint-results*.xml
 
-      - name: Upload security scan results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: security-scan-results
-          path: |
-            **/build/reports/dependency-check-report.html
-            **/build/reports/dependency-check-report.xml
+      # Security scan results upload removed - using Dependabot instead  
+      # - name: Upload security scan results
+      #   uses: actions/upload-artifact@v4
+      #   if: always()
+      #   with:
+      #     name: security-scan-results
+      #     path: |
+      #       **/build/reports/dependency-check-report.html
+      #       **/build/reports/dependency-check-report.xml
 
   release:
     name: Release
