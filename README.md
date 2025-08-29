@@ -11,7 +11,7 @@
 
 
 Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates how to implement the **Axeptio Android SDK** in your mobile applications.
-## 📑 Table of Contents
+## Table of Contents
 1. [Overview](#overview)
 2. [Getting Started](#getting-started)
 3. [Local Testing with Production Widget Configuration](#local-testing-with-production-widget-configuration)
@@ -30,7 +30,7 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 
 <br><br>
 
-## 👨‍💻Overview
+## Overview
 This project includes two modules:
 - `samplejava`: Demonstrates how to use the Axeptio SDK with Java and XML.
 - `samplekotlin`: Shows the integration of the Axeptio SDK with Kotlin and Compose, including advanced debugging features and configuration management.
@@ -63,7 +63,7 @@ git clone https://github.com/axeptio/sample-app-android
 > The following steps explain how to create a Personal Access Token and configure Gradle to use it securely via environment variables.
 
 To properly configure access to the Axeptio SDK, you need to add your GitHub token in the `settings.gradle.kts` file to fetch the SDK from the private repository. The library is not available on a public Maven repository, so it is crucial to configure the private repository correctly to avoid errors. You can also consider publishing the Axeptio SDK to a public repository to simplify integration, reducing the process complexity. Here’s how to configure the private repository in the `settings.gradle.kts` file:
-```kotin
+```kotlin
 maven {
     url = uri("https://maven.pkg.github.com/axeptio/axeptio-android-sdk")
     credentials {
@@ -143,7 +143,7 @@ To test the version currently in production, instead checkout the `sample-app-an
 implementation("io.axept.android:android-sdk:2.0.6")
 ```
 To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
-```kotin
+```kotlin
 productFlavors {
     create("publishers") {
         dimension = "service"
@@ -160,9 +160,9 @@ productFlavors {
 }
 ```
 Use the *Build Variants* tab to switch between brands and publishers as needed. Finally, make sure your `settings.gradle.kts` includes your GitHub credentials for accessing the SDK:
-```kotin
+```kotlin
 maven {
-    url = uri("https://maven.pkg.github.com/axeptio/tcf-android-sdk")
+    url = uri("https://maven.pkg.github.com/axeptio/axeptio-android-sdk")
     credentials {
         username = "USER" // TODO: GITHUB USERNAME
         password = "TOKEN" // TODO: GITHUB TOKEN
@@ -171,7 +171,7 @@ maven {
 ```
 
 <br><br><br>
-## 🔀Switching Between Publisher and Brand Flavors
+## Switching Between Publisher and Brand Flavors
 The Axeptio SDK provides two build flavors: `publishers` and `brands`. You can switch between them depending on your project needs. Each flavor activates specific behavior in the SDK.
 #### In Android Studio:
 1. Locate the *"Build Variants"* tab (usually in the lower-left corner of the IDE).
@@ -193,7 +193,7 @@ Make sure to clean the project if you switch flavors often:
 
 
 <br><br><br>
-## 💻Axeptio SDK Implementation
+## Axeptio SDK Implementation
 The Axeptio SDK provides consent management functionality for Android applications, enabling seamless integration for handling user consent.
 
 ##### Gradle Implementation
@@ -301,33 +301,6 @@ Once the SDK is initialized, the consent popup will automatically display if the
 ##### Transferring User Consents (Publishers)
 For publishers, you can transfer a user's consent information by providing their Axeptio token. This token allows the SDK to automatically update the user's consent preferences in the SharedPreferences, following the TCFv2 (Transparency and Consent Framework) IAB (Interactive Advertising Bureau) specifications.
 
-##### Preventing Multiple Initializations of the SDK
-Calling `initialize()` multiple times during the same session can cause crashes. To avoid this, always check if the SDK has already been initialized before making the call:
-- **Kotlin**
-```kotlin
-if (!AxeptioSDK.instance().isInitialized()) {
-    AxeptioSDK.instance().initialize(
-        activity = this@MainActivity,
-        targetService = AxeptioService.PUBLISHERS_TCF,
-        clientId = "your_client_id",
-        cookiesVersion = "your_cookies_version",
-        token = "optional_consent_token"
-    )
-}
-```
-- **Java**
-```java
-if (!AxeptioSDK.instance().isInitialized()) {
-    AxeptioSDK.instance().initialize(
-        MainActivity.this,
-        AxeptioService.PUBLISHERS_TCF,
-        "your_project_id",
-        "your_configuration_id",
-        "optional_consent_token"
-    );
-}
-```
-By checking the `isInitialized()` method, you ensure that the SDK is initialized only once, preventing potential issues caused by multiple initializations.
 
 ##### Handling the "INSTALL_FAILED_INVALID_APK" Error
 This error can occur during installation, typically due to issues with the APK or dependencies. The best solution is to perform a **clean build** to ensure that all libraries are properly integrated. To do so, execute the following command in your terminal:
@@ -362,7 +335,7 @@ The integration of the Axeptio SDK into your mobile application involves clear d
 
 <br><br><br>
 
-## 🔑Get Stored Consents
+## Get Stored Consents
 You can retrieve the consents stored by the Axeptio SDK in **SharedPreferences**. The following example demonstrates how to access these values within your app:
 - **Kotlin Examples**
 ```kotlin
@@ -386,7 +359,7 @@ AxeptioSDK.instance().showConsentScreen(
     managePreferencesUseCase = true  // Optional: Manages user preferences when the popup is shown
 )
 ```
--**Java**
+- **Java**
 ```java
 // Show the consent popup on demand
 AxeptioSDK.instance().showConsentScreen(
@@ -406,7 +379,7 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
     }
 })
 ```
--**Java**
+- **Java**
 ```java
 // Set an event listener for when the consent popup is closed
 AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
@@ -448,7 +421,7 @@ AxeptioSDK.instance().appendAxeptioToken(
 This will return: `https://myurl.com?axeptio_token=[token]`
 
 <br><br><br>
-## 🧹Clear User's Consent Choices
+## Clear User's Consent Choices
 To clear the user’s consent choices, you can use the following method. Please note that this operation is asynchronous, so you should use the `AxeptioEventListener.onConsentCleared()` method to be notified when the user’s consent choices have been cleared from SharedPreferences.
 - **Kotlin**
 ```kotlin
@@ -562,7 +535,7 @@ By following these steps, you can ensure that Google Consent Mode is correctly i
 
 <br><br><br>
 
-## 🔬 Advanced SDK APIs - Vendor Consent Management
+## Advanced SDK APIs - Vendor Consent Management
 The Axeptio SDK provides advanced APIs for detailed vendor consent analysis and management. These APIs are particularly useful for Publishers using the TCF service to analyze and work with vendor-specific consent data.
 
 ### Vendor Consent Query APIs
@@ -689,15 +662,7 @@ fun processUserData(vendorId: Int, userData: UserData) {
 }
 ```
 
-5. **Initialization Check**: Ensure the SDK is initialized before calling these APIs:
-```kotlin
-if (AxeptioSDK.instance().isInitialized()) {
-    val consents = AxeptioSDK.instance().getVendorConsents()
-    // Process consents...
-} else {
-    Log.w("SDK", "AxeptioSDK not initialized - cannot retrieve vendor consents")
-}
-```
+5. **Initialization Check**: Ensure the SDK is initialized before calling these APIs by checking that you have called the `initialize()` method successfully before attempting to retrieve vendor consent data.
 
 > **⚠️ Important Note**: The vendor consent APIs are available starting from SDK version 2.1.0 and are primarily intended for Publishers using the TCF service. For Brands service implementations, these APIs may return empty or limited data.
 
