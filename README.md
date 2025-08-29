@@ -26,6 +26,7 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 12. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
 13. [Clear User's Consent Choices](#clear-users-consent-choices)
 14. [Google Consent v2](#google-consent-v2)
+15. [TCF Vendor Management APIs](#tcf-vendor-management-apis)
 
 
 <br><br>
@@ -535,11 +536,18 @@ By following these steps, you can ensure that Google Consent Mode is correctly i
 
 <br><br><br>
 
-## Advanced SDK APIs - Vendor Consent Management
-The Axeptio SDK provides advanced APIs for detailed vendor consent analysis and management. These APIs are particularly useful for Publishers using the TCF service to analyze and work with vendor-specific consent data.
+## TCF Vendor Management APIs
+The Axeptio SDK provides comprehensive APIs for managing vendor consent in TCF (Transparency and Consent Framework) mode. These APIs are **exclusively available for Publishers using the TCF service** and allow you to query individual vendor consent states, implement vendor-specific functionality, and maintain compliance with IAB TCF requirements.
 
-### Vendor Consent Query APIs
-These APIs allow you to retrieve and analyze vendor consent information:
+#### When to Use TCF Vendor APIs
+Use these APIs when your app needs to:
+- Query consent status for specific advertising vendors
+- Implement vendor-specific data processing logic
+- Debug consent collection issues in TCF mode
+- Ensure compliance with specific vendor requirements
+
+### Available TCF Vendor APIs
+These APIs allow you to retrieve and analyze vendor consent information in TCF mode:
 
 ##### Get All Vendor Consents
 Returns a map of all vendor IDs with their consent status:
@@ -645,7 +653,7 @@ try {
 
 1. **Error Handling**: Always wrap API calls in try-catch blocks as these APIs may throw exceptions if the SDK is not properly initialized or if no consent data is available.
 
-2. **Service Compatibility**: These vendor APIs are primarily designed for the **Publishers TCF** service. When using the **Brands** service, these APIs may return empty results.
+2. **TCF Service Requirement**: These vendor APIs are **exclusively for Publishers using the TCF service**. When using the **Brands** service, these APIs will return empty results as vendor consent management is specific to the TCF framework.
 
 3. **Performance Considerations**: Cache vendor consent results when possible, as parsing TCF data can be computationally intensive for large vendor lists.
 
@@ -664,7 +672,7 @@ fun processUserData(vendorId: Int, userData: UserData) {
 
 5. **Initialization Check**: Ensure the SDK is initialized before calling these APIs by checking that you have called the `initialize()` method successfully before attempting to retrieve vendor consent data.
 
-> **⚠️ Important Note**: The vendor consent APIs are available starting from SDK version 2.1.0 and are primarily intended for Publishers using the TCF service. For Brands service implementations, these APIs may return empty or limited data.
+> **⚠️ Important Note**: The TCF vendor consent APIs are available starting from SDK version 2.0.8 and are **exclusively for Publishers using the TCF service**. These APIs will return empty results when used with the Brands service, as vendor consent management is specific to the TCF framework.
 
 <br><br><br>
 For more detailed information, you can visit the [Axeptio documentation](https://support.axeptio.eu/hc/en-gb).
