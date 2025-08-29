@@ -27,7 +27,7 @@
     "commitlint": "commitlint --edit"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "keywords": [
     "axeptio",
