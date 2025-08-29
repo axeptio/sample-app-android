@@ -40,12 +40,14 @@ android {
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
             create("brands") {
                 dimension = "service"
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
         }
     }
@@ -70,7 +72,9 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:android-sdk:2.0.6")
+    // Use local SDK sources for development
+    implementation(project(":android"))
+    // implementation("io.axept.android:android-sdk:2.0.6") // Commented for local development
 
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))

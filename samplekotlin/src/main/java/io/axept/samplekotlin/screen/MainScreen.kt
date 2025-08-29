@@ -25,6 +25,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,13 +49,21 @@ import io.axept.samplekotlin.MainActivity
 import io.axept.samplekotlin.TAG
 import io.axept.samplekotlin.ui.theme.Red
 import io.axept.samplekotlin.ui.theme.Yellow
+import io.axept.samplekotlin.config.ConfigurationManager
+import io.axept.samplekotlin.BuildConfig
 
 @Composable
 fun MainScreen(
     targetService: AxeptioService,
-    onOpenWebView: (token: String) -> Unit
+    onOpenWebView: (token: String) -> Unit,
+    onNavigateToVendorTest: () -> Unit = {},
+    onNavigateToConfiguration: () -> Unit = {},
+    onNavigateToDebugInfo: () -> Unit = {}
 ) {
     val activity = LocalContext.current as MainActivity
+    val context = LocalContext.current
+    val configManager = remember { ConfigurationManager.getInstance(context) }
+    val currentConfig = configManager.currentConfiguration
     val viewModel: MainViewModel =
         viewModel(factory = MainViewModel.Companion.Factory(activity.application))
 
@@ -72,6 +83,11 @@ fun MainScreen(
     val shouldLoadAdd = remember {
         mutableIntStateOf(0)
     }
+    val coroutineScope = rememberCoroutineScope()
+    
+    // Clear consent state
+    val clearConsentInProgress = remember { mutableStateOf(false) }
+    val clearConsentSuccess = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.setTargetService(targetService)
@@ -79,7 +95,11 @@ fun MainScreen(
 
     Scaffold(
         topBar = {
-            AxeptioTopBar()
+            AxeptioTopBar(
+                serviceName = configManager.currentServiceDisplayName,
+                sdkVersion = BuildConfig.AXEPTIO_SDK_VERSION,
+                onConfigurationClick = onNavigateToConfiguration
+            )
         }
     ) { innerPadding ->
         Surface(
@@ -121,11 +141,45 @@ fun MainScreen(
                         }
                     )
 
+                    // New TCF Vendor API Testing button (only for TCF service)
                     AxeptioButton(
-                        label = "Clear consent",
+                        label = "TCF Vendor API Test",
+                        enabled = currentConfig.targetService == AxeptioService.PUBLISHERS_TCF,
+                        onClick = onNavigateToVendorTest
+                    )
+
+                    // Debug Consent Info button
+                    AxeptioButton(
+                        label = "Debug Consent Info",
+                        onClick = onNavigateToDebugInfo,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    AxeptioButton(
+                        label = if (clearConsentSuccess.value) "✅ Consent Cleared!" 
+                               else if (clearConsentInProgress.value) "Clearing..." 
+                               else "Clear consent",
+                        enabled = !clearConsentInProgress.value,
+                        loading = clearConsentInProgress.value,
                         onClick = {
+                            clearConsentInProgress.value = true
+                            clearConsentSuccess.value = false
+                            
+                            // Clear consent with feedback
                             AxeptioSDK.instance().clearConsents()
-                            shouldLoadAdd.value++
+                            
+                            // Simulate async operation completion
+                            // In a real scenario, we'd wait for the clearConsents callback
+                            coroutineScope.launch {
+                                delay(1000) // Wait for clearing to complete
+                                clearConsentInProgress.value = false
+                                clearConsentSuccess.value = true
+                                shouldLoadAdd.value++
+                                
+                                // Reset success message after 3 seconds
+                                delay(3000)
+                                clearConsentSuccess.value = false
+                            }
                         },
                         color = Red
                     )
@@ -179,14 +233,44 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun AxeptioTopBar() {
+internal fun AxeptioTopBar(
+    serviceName: String = "",
+    sdkVersion: String = "",
+    onConfigurationClick: () -> Unit = {}
+) {
     TopAppBar(
         title = {
-            Text(
-                text = "Axeptio | Kotlin Sample",
-                style = MaterialTheme.typography.headlineMedium
-            )
+            Column {
+                Text(
+                    text = "Axeptio | Kotlin Sample",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                if (serviceName.isNotEmpty()) {
+                    Text(
+                        text = "Service: $serviceName",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (sdkVersion.isNotEmpty()) {
+                    Text(
+                        text = "SDK: $sdkVersion",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
         },
+        actions = {
+            Button(
+                onClick = onConfigurationClick,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            ) {
+                Text("Config")
+            }
+        }
     )
 }
 
