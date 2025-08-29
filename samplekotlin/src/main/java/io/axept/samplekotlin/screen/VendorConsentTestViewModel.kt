@@ -27,6 +27,7 @@ class VendorConsentTestViewModel : ViewModel() {
         try {
             val axeptio = AxeptioSDK.instance()
             
+            // Best Practice: Check SDK initialization before calling vendor APIs
             // Get all vendor consent data using the new APIs
             val allVendorConsents = axeptio.getVendorConsents()
             val consentedVendors = axeptio.getConsentedVendors()
@@ -68,6 +69,7 @@ class VendorConsentTestViewModel : ViewModel() {
         
         try {
             val axeptio = AxeptioSDK.instance()
+            // Best Practice: Use isVendorConsented() for compliance checks in data processing
             val isConsented = axeptio.isVendorConsented(vendorId)
             
             _uiState.value = _uiState.value.copy(
@@ -75,6 +77,7 @@ class VendorConsentTestViewModel : ViewModel() {
                 vendorIdText = "" // Clear the text field
             )
         } catch (e: Exception) {
+            // Best Practice: On error, assume no consent for safety
             _uiState.value = _uiState.value.copy(
                 testResult = "Error testing vendor $vendorId: ${e.message}",
                 vendorIdText = ""

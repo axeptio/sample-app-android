@@ -71,9 +71,12 @@ class DebugConsentInfoViewModel(application: Application) : AndroidViewModel(app
             }
 
             // Collect vendor information (TCF specific)
+            // Best Practice: These vendor APIs are only available for Publishers TCF service
             val vendorInfo = try {
                 if (configurationManager.currentConfiguration.targetService == AxeptioService.PUBLISHERS_TCF) {
                     try {
+                        // Best Practice: Always wrap vendor API calls in try-catch blocks
+                        // These APIs may throw exceptions if SDK not initialized or no consent data
                         val vendorConsents = axeptioSDK.getVendorConsents()
                         val consentedVendors = axeptioSDK.getConsentedVendors()
                         val refusedVendors = axeptioSDK.getRefusedVendors()

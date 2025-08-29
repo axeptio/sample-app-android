@@ -28,10 +28,11 @@ fun VendorConsentTestScreen(
     val uiState by viewModel.uiState.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
     
-    // Auto-refresh every 3 seconds
+    // Auto-refresh every 10 seconds (reduced frequency for production example)
+    // Note: In production apps, consider user-triggered refresh instead of auto-refresh
     LaunchedEffect(Unit) {
         while (true) {
-            delay(3000)
+            delay(10000) // 10 seconds - more reasonable for battery/performance
             viewModel.refreshVendorData()
         }
     }
