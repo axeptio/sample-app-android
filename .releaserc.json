@@ -1,0 +1,44 @@
+{
+  "branches": [
+    "master",
+    {
+      "name": "develop",
+      "prerelease": "beta"
+    }
+  ],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "node scripts/update-version.js ${nextRelease.version}"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md", "samplekotlin/build.gradle.kts", "samplejava/build.gradle.kts"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ],
+  "preset": "conventionalcommits",
+  "releaseRules": [
+    {"type": "docs", "scope": "README", "release": "patch"},
+    {"type": "refactor", "release": "patch"},
+    {"type": "style", "release": false},
+    {"type": "chore", "release": false},
+    {"type": "test", "release": false}
+  ],
+  "parserOpts": {
+    "noteKeywords": ["BREAKING CHANGE", "BREAKING CHANGES"]
+  }
+}

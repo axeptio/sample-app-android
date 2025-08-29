@@ -2,6 +2,8 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.gms.google-services")
+    // OWASP dependency check removed - using Dependabot for vulnerability scanning
+    // id("org.owasp.dependencycheck")
 }
 
 android {
@@ -40,12 +42,14 @@ android {
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
             create("brands") {
                 dimension = "service"
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"Local Development Build\"")
             }
         }
     }
@@ -70,7 +74,14 @@ android {
 }
 
 dependencies {
-    implementation("io.axept.android:android-sdk:2.0.6")
+    // Use local SDK sources for development, published SDK for CI
+    if (project.findProject(":android") != null) {
+        // Local development with SDK sources
+        implementation(project(":android"))
+    } else {
+        // CI/CD or production builds - use published SDK
+        implementation("io.axept.android:android-sdk:2.0.8")
+    }
 
 
     implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
@@ -94,6 +105,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

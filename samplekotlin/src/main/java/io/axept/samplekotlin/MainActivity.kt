@@ -25,15 +25,17 @@ import io.axept.samplekotlin.navigation.AppNavHost
 import io.axept.samplekotlin.screen.MainScreen
 import io.axept.samplekotlin.screen.MainViewModel
 import io.axept.samplekotlin.ui.theme.SampleKotlinTheme
+import io.axept.samplekotlin.config.ConfigurationManager
 
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val targetService =
-            if (BuildConfig.AXEPTIO_TARGET_SERVICE == "publishers") AxeptioService.PUBLISHERS_TCF
-            else AxeptioService.BRANDS
+        // Get configuration from ConfigurationManager instead of BuildConfig
+        val configManager = ConfigurationManager.getInstance(this)
+        val currentConfig = configManager.currentConfiguration
+        val targetService = currentConfig.targetService
 
         setContent {
             SampleKotlinTheme {
@@ -49,9 +51,9 @@ class MainActivity : ComponentActivity() {
         AxeptioSDK.instance().initialize(
             activity = this,
             targetService = targetService,
-            clientId = BuildConfig.AXEPTIO_CLIENT_ID,
-            cookiesVersion = BuildConfig.AXEPTIO_COOKIES_VERSION,
-            token = null
+            clientId = currentConfig.clientId,
+            cookiesVersion = currentConfig.cookiesVersion,
+            token = currentConfig.token
         )
 
         // Google consent v2 implementation

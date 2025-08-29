@@ -33,9 +33,18 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 ## 👨‍💻Overview
 This project includes two modules:
 - `samplejava`: Demonstrates how to use the Axeptio SDK with Java and XML.
-- `samplekotlin`: Shows the integration of the Axeptio SDK with Kotlin and Compose.
+- `samplekotlin`: Shows the integration of the Axeptio SDK with Kotlin and Compose, including advanced debugging features and configuration management.
 
 Both modules can be built using either the **brands** or **publishers** variants, depending on your specific needs.
+
+### Sample App Features
+The `samplekotlin` module includes additional debugging and testing capabilities:
+- **Configuration Management**: Dynamic switching between Brands and Publishers TCF services
+- **Debug Consent Info**: Detailed analysis of TCF consent data and vendor information  
+- **Vendor Consent Testing**: Live testing interface for individual vendor consent validation
+- **Automation Scripts**: Complete build, deploy, and testing automation
+
+> **⚠️ Note**: The `ConfigurationManager` class is part of the sample application and is not included in the Axeptio SDK. It demonstrates how to implement dynamic configuration switching in your own applications.
 
 <br><br><br>
 
@@ -550,6 +559,148 @@ AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
 4. Use Firebase’s `setConsent()` method to update the user’s consent status in Firebase Analytics.
 
 By following these steps, you can ensure that Google Consent Mode is correctly integrated with your application, and Firebase Analytics receives the consent status updates accordingly.
+
+<br><br><br>
+
+## 🔬 Advanced SDK APIs - Vendor Consent Management
+The Axeptio SDK provides advanced APIs for detailed vendor consent analysis and management. These APIs are particularly useful for Publishers using the TCF service to analyze and work with vendor-specific consent data.
+
+### Vendor Consent Query APIs
+These APIs allow you to retrieve and analyze vendor consent information:
+
+##### Get All Vendor Consents
+Returns a map of all vendor IDs with their consent status:
+- **Kotlin**:
+```kotlin
+try {
+    val vendorConsents: Map<Int, Boolean> = AxeptioSDK.instance().getVendorConsents()
+    // vendorConsents contains: {755: true, 756: false, 757: true, ...}
+    
+    vendorConsents.forEach { (vendorId, isConsented) ->
+        println("Vendor $vendorId: ${if (isConsented) "CONSENTED" else "REFUSED"}")
+    }
+} catch (e: Exception) {
+    // Handle potential errors (e.g., SDK not initialized, no consent data)
+    Log.e("VendorConsents", "Error retrieving vendor consents: ${e.message}")
+}
+```
+
+##### Get Consented Vendors List
+Returns only the vendor IDs that have been consented to:
+- **Kotlin**:
+```kotlin
+try {
+    val consentedVendors: List<Int> = AxeptioSDK.instance().getConsentedVendors()
+    // consentedVendors contains: [755, 757, 760, ...]
+    
+    println("${consentedVendors.size} vendors have been consented to")
+    consentedVendors.forEach { vendorId ->
+        println("✅ Vendor $vendorId is consented")
+    }
+} catch (e: Exception) {
+    Log.e("ConsentedVendors", "Error retrieving consented vendors: ${e.message}")
+}
+```
+
+##### Get Refused Vendors List
+Returns only the vendor IDs that have been refused:
+- **Kotlin**:
+```kotlin
+try {
+    val refusedVendors: List<Int> = AxeptioSDK.instance().getRefusedVendors()
+    // refusedVendors contains: [756, 758, 759, ...]
+    
+    println("${refusedVendors.size} vendors have been refused")
+    refusedVendors.forEach { vendorId ->
+        println("❌ Vendor $vendorId is refused")
+    }
+} catch (e: Exception) {
+    Log.e("RefusedVendors", "Error retrieving refused vendors: ${e.message}")
+}
+```
+
+##### Check Individual Vendor Consent
+Check if a specific vendor has consent:
+- **Kotlin**:
+```kotlin
+try {
+    val vendorId = 755 // Example vendor ID
+    val isConsented: Boolean = AxeptioSDK.instance().isVendorConsented(vendorId)
+    
+    if (isConsented) {
+        println("✅ Vendor $vendorId has consent - proceed with data processing")
+        // Safe to process data with this vendor
+    } else {
+        println("❌ Vendor $vendorId does not have consent - skip data processing")
+        // Do not process data with this vendor
+    }
+} catch (e: Exception) {
+    Log.e("VendorCheck", "Error checking vendor $vendorId: ${e.message}")
+    // Assume no consent on error for safety
+}
+```
+
+### Debug and Analysis APIs
+For debugging and detailed consent analysis:
+
+##### Get Consent Debug Information
+Returns detailed consent information including TCF strings and raw data:
+- **Kotlin**:
+```kotlin
+try {
+    val debugInfo: Map<String, Any?> = AxeptioSDK.instance().getConsentDebugInfo()
+    
+    // Access common TCF fields
+    val tcfString = debugInfo["IABTCF_TCString"] as? String
+    val vendorConsents = debugInfo["IABTCF_VendorConsents"] as? String
+    val vendorLegitimateInterests = debugInfo["IABTCF_VendorLegitimateInterests"] as? String
+    
+    println("TCF String: $tcfString")
+    println("Vendor Consents Bitstring: $vendorConsents")
+    println("Vendor Legitimate Interests: $vendorLegitimateInterests")
+    
+    // Log all available debug fields
+    debugInfo.forEach { (key, value) ->
+        println("$key: $value")
+    }
+} catch (e: Exception) {
+    Log.e("DebugInfo", "Error retrieving debug information: ${e.message}")
+}
+```
+
+### Best Practices for Vendor API Usage
+
+1. **Error Handling**: Always wrap API calls in try-catch blocks as these APIs may throw exceptions if the SDK is not properly initialized or if no consent data is available.
+
+2. **Service Compatibility**: These vendor APIs are primarily designed for the **Publishers TCF** service. When using the **Brands** service, these APIs may return empty results.
+
+3. **Performance Considerations**: Cache vendor consent results when possible, as parsing TCF data can be computationally intensive for large vendor lists.
+
+4. **Data Processing Logic**: Use `isVendorConsented()` in your data processing pipeline to ensure compliance:
+```kotlin
+fun processUserData(vendorId: Int, userData: UserData) {
+    if (AxeptioSDK.instance().isVendorConsented(vendorId)) {
+        // Proceed with data processing
+        sendDataToVendor(vendorId, userData)
+    } else {
+        // Skip processing for this vendor
+        Log.d("Compliance", "Skipping vendor $vendorId - no consent")
+    }
+}
+```
+
+5. **Initialization Check**: Ensure the SDK is initialized before calling these APIs:
+```kotlin
+if (AxeptioSDK.instance().isInitialized()) {
+    val consents = AxeptioSDK.instance().getVendorConsents()
+    // Process consents...
+} else {
+    Log.w("SDK", "AxeptioSDK not initialized - cannot retrieve vendor consents")
+}
+```
+
+> **⚠️ Important Note**: The vendor consent APIs are available starting from SDK version 2.1.0 and are primarily intended for Publishers using the TCF service. For Brands service implementations, these APIs may return empty or limited data.
+
 <br><br><br>
 For more detailed information, you can visit the [Axeptio documentation](https://support.axeptio.eu/hc/en-gb).
 We hope this guide helps you get started with the Axeptio Android SDK. Good luck with your integration, and thank you for choosing Axeptio!

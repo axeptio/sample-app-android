@@ -1,0 +1,41 @@
+{
+  "name": "axeptio-android-sample-app",
+  "version": "2.0.6",
+  "description": "Axeptio Android SDK Sample Applications",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/axeptio/sample-app-android.git"
+  },
+  "license": "Apache-2.0",
+  "private": true,
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
+    "@semantic-release/commit-analyzer": "^11.1.0",
+    "@semantic-release/release-notes-generator": "^12.1.0",
+    "conventional-changelog-conventionalcommits": "^7.0.2",
+    "husky": "^8.0.3",
+    "semantic-release": "^22.0.12"
+  },
+  "scripts": {
+    "semantic-release": "semantic-release",
+    "prepare": "husky install",
+    "commitlint": "commitlint --edit"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "axeptio",
+    "android",
+    "consent-management",
+    "tcf",
+    "gdpr",
+    "sdk",
+    "sample-app"
+  ]
+}
