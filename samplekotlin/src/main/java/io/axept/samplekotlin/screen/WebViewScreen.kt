@@ -1,7 +1,8 @@
 package io.axept.samplekotlin.screen
 
-import android.net.Uri
+import android.annotation.SuppressLint
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,12 +14,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewState
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import io.axept.android.library.Axeptio
 import io.axept.android.library.AxeptioSDK
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 internal fun WebViewScreen(
     customToken: String?,
@@ -26,34 +27,38 @@ internal fun WebViewScreen(
     axeptio: Axeptio = AxeptioSDK.instance()
 ) {
     val url = axeptio.appendAxeptioToken(
-        uri = Uri.parse("https://google-cmp-partner.axept.io/cmp-for-publishers.html"),
-        token = customToken ?: axeptio.token ?: ""
-    )
-    val state = rememberWebViewState(url.toString())
+        uri = "https://google-cmp-partner.axept.io/cmp-for-publishers.html".toUri(),
+        token = customToken ?: axeptio.token.orEmpty()
+    ).toString()
 
     Scaffold(
         topBar = {
             TopBar(back = onBack)
         }
     ) { innerPadding ->
-        WebView(
+        AndroidView(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            state = state,
-            onCreated = {
-                it.settings.javaScriptEnabled = true
-                it.settings.domStorageEnabled = true
-            },
-            client = object : AccompanistWebViewClient() {
-                override fun onPageFinished(view: WebView, url: String?) {
-                    super.onPageFinished(view, url)
-                    view.evaluateJavascript("""localStorage.clear();""".trimIndent(), null)
+            factory = { context ->
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = true
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView, url: String?) {
+                            super.onPageFinished(view, url)
+                            view.evaluateJavascript("""localStorage.clear();""", null)
+                        }
+                    }
+                    loadUrl(url)
                 }
+            },
+            update = { webView ->
+                // reload if URL changes
+                webView.loadUrl(url)
             }
         )
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
