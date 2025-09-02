@@ -1,6 +1,9 @@
 package io.axept.samplekotlin.screen
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +16,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import io.axept.android.library.Axeptio
@@ -26,36 +33,43 @@ internal fun WebViewScreen(
     onBack: () -> Unit,
     axeptio: Axeptio = AxeptioSDK.instance()
 ) {
-    val url = axeptio.appendAxeptioToken(
-        uri = "https://google-cmp-partner.axept.io/cmp-for-publishers.html".toUri(),
-        token = customToken ?: axeptio.token.orEmpty()
-    ).toString()
+    val context = LocalContext.current
+
+    val url by remember(customToken, axeptio.token) {
+        mutableStateOf(
+            axeptio.appendAxeptioToken(
+                uri = "https://google-cmp-partner.axept.io/cmp-for-publishers.html".toUri(),
+                token = customToken ?: axeptio.token.orEmpty()
+            ).toString()
+        )
+    }
+
+    val webView = remember {
+        WebView(context).apply {
+            settings.apply {
+                javaScriptEnabled = true
+                domStorageEnabled = true
+            }
+
+            webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView, url: String?) {
+                    super.onPageFinished(view, url)
+                    view.evaluateJavascript("localStorage.clear();", null)
+                }
+            }
+        }
+    }
 
     Scaffold(
-        topBar = {
-            TopBar(back = onBack)
-        }
+        topBar = { TopBar(back = onBack) }
     ) { innerPadding ->
         AndroidView(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
-            factory = { context ->
-                WebView(context).apply {
-                    settings.javaScriptEnabled = true
-                    settings.domStorageEnabled = true
-                    webViewClient = object : WebViewClient() {
-                        override fun onPageFinished(view: WebView, url: String?) {
-                            super.onPageFinished(view, url)
-                            view.evaluateJavascript("""localStorage.clear();""", null)
-                        }
-                    }
-                    loadUrl(url)
-                }
-            },
+            factory = { webView },
             update = { webView ->
-                // reload if URL changes
-                webView.loadUrl(url)
+                if(webView.url != url) webView.loadUrl(url)
             }
         )
     }
@@ -65,10 +79,13 @@ internal fun WebViewScreen(
 @Composable
 private fun TopBar(back: () -> Unit) {
     TopAppBar(
-        title = { },
+        title = {},
         navigationIcon = {
             IconButton(onClick = back) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "back"
+                )
             }
         }
     )

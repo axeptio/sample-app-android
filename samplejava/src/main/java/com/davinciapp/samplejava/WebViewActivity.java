@@ -1,5 +1,6 @@
 package com.davinciapp.samplejava;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.webkit.WebView;
@@ -12,6 +13,7 @@ import io.axept.android.library.AxeptioSDK;
 
 public class WebViewActivity extends AppCompatActivity {
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
