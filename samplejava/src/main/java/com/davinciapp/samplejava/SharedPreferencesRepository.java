@@ -1,6 +1,7 @@
 package com.davinciapp.samplejava;
 
 import android.app.Application;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -15,7 +16,10 @@ class SharedPreferencesRepositoryImpl implements SharedPreferencesRepository {
 
     SharedPreferencesRepositoryImpl(Application application) {
         this.application = application;
-        this.pref = PreferenceManager.getDefaultSharedPreferences(application);
+        this.pref = application.getSharedPreferences(
+                application.getPackageName() + "_preferences",
+                Context.MODE_PRIVATE
+        );
     }
 
     @Override
@@ -58,9 +62,9 @@ enum TCFFields {
     PublisherLegitimateInterests("IABTCF_PublisherLegitimateInterests", String.class),
     PublisherCustomPurposesConsents("IABTCF_PublisherCustomPurposesConsents", String.class),
     PublisherCustomPurposesLegitimateInterests(
-        "IABTCF_PublisherCustomPurposesLegitimateInterests",
-        String.class
-        );
+            "IABTCF_PublisherCustomPurposesLegitimateInterests",
+            String.class
+    );
 
     String key;
     Class<?> type;

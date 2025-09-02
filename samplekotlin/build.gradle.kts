@@ -14,7 +14,7 @@ android {
         applicationId = "io.axept.samplekotlin"
         minSdk = 26
         targetSdk = 35
-        versionCode = NaN
+        versionCode = 1
         versionName = "1.0.0-beta.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
