@@ -1,3 +1,11 @@
+## [1.0.0-beta.2](https://github.com/axeptio/sample-app-android/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-09-02)
+
+
+### Bug Fixes
+
+* apply feedback from PR ([27b0954](https://github.com/axeptio/sample-app-android/commit/27b0954f69db40c4eb0e43d3df5c35b4673c1019))
+* deprecated-api-warnings-in-android-sample-app ([681d812](https://github.com/axeptio/sample-app-android/commit/681d8123fa0fe5f8977697abf870db4dd9dff4a8))
+
 ## 1.0.0-beta.1 (2025-08-29)
 
 

@@ -14,8 +14,8 @@ android {
         applicationId = "io.axept.samplekotlin"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0-beta.1"
+        versionCode = NaN
+        versionName = "1.0.0-beta.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
