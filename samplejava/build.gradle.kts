@@ -14,8 +14,8 @@ android {
         applicationId = "com.davinciapp.samplejava"
         minSdk = 26
         targetSdk = 35
-        versionCode = NaN
-        versionName = "1.0.0-beta.1"
+        versionCode = 20008
+        versionName = "2.0.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - develop
   pull_request:
     branches:
       - master
@@ -38,7 +37,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -110,29 +109,58 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: quality-checks
     
     permissions:
       contents: write
       issues: write
       pull-requests: write
-      id-token: write
+      packages: write
     
     steps:
+      - name: Audit Secrets SHA256
+        run: |
+          echo "=== Secrets SHA256 Audit ==="
+          echo "BOT_GITHUB_TOKEN: $(echo -n '${{ secrets.BOT_GITHUB_TOKEN }}' | sha256sum | cut -d' ' -f1)"
+          echo "BOT_GPG_PRIVATE_KEY: $(echo -n '${{ secrets.BOT_GPG_PRIVATE_KEY }}' | sha256sum | cut -d' ' -f1)"
+          echo "BOT_EMAIL: $(echo -n '${{ secrets.BOT_EMAIL }}' | sha256sum | cut -d' ' -f1)"
+          echo "=== End Secrets Audit ==="
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           persist-credentials: false
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+
+      - name: Import GPG key
+        id: import_gpg
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.BOT_GPG_PRIVATE_KEY }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          git_tag_gpgsign: true
+          git_config_global: true
+          git_committer_name: axeptio-release-bot
+          git_committer_email: ${{ secrets.BOT_EMAIL }}
+      
+      - name: Configure Git for signed commits
+        run: |
+          git config --global commit.gpgsign true
+          git config --global tag.gpgsign true
+          git config --global user.signingkey "${{ steps.import_gpg.outputs.keyid }}"
+          git config --global gpg.program "$(which gpg)"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -144,7 +172,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -161,16 +189,115 @@ jobs:
           ./gradlew assembleRelease
         env:
           GITHUB_USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
-      - name: Release
+      - name: Get Next Version
+        id: get_version
+        uses: PaulHatch/semantic-version@v5.4.0
+        with:
+          tag_prefix: "v"
+          major_pattern: "(MAJOR)"
+          minor_pattern: "(MINOR)"
+          version_format: "${major}.${minor}.${patch}"
+          change_path: "."
+          namespace: ""
+          bump_each_commit: false
+          search_commit_body: false
+          user_format_type: "json"
+          enable_prerelease_mode: false
+
+      - name: Check and Clean Existing Tag
+        if: steps.get_version.outputs.changed == 'true'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GIT_AUTHOR_NAME: axeptio-release-bot
-          GIT_AUTHOR_EMAIL: tech@axeptio.com
-          GIT_COMMITTER_NAME: axeptio-release-bot  
-          GIT_COMMITTER_EMAIL: tech@axeptio.com
-        run: npx semantic-release
+          GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+        run: |
+          # Set up authentication for tag operations
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
+          
+          # Check if tag exists locally
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "Tag v${{ steps.get_version.outputs.version }} exists locally, deleting..."
+            git tag -d "v${{ steps.get_version.outputs.version }}"
+          fi
+          
+          # Check if tag exists remotely and delete it
+          if git ls-remote --tags origin | grep -q "refs/tags/v${{ steps.get_version.outputs.version }}"; then
+            echo "Tag v${{ steps.get_version.outputs.version }} exists remotely, deleting..."
+            git push origin ":refs/tags/v${{ steps.get_version.outputs.version }}"
+          fi
+
+      - name: Update versions using existing script
+        if: steps.get_version.outputs.changed == 'true'
+        run: |
+          # Update package.json version (no git operations)
+          npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+          
+          # Update Android versions using existing script (already handles both sample apps)
+          node scripts/update-version.js ${{ steps.get_version.outputs.version }}
+          
+          # Commit all version updates in one signed commit
+          git add package.json package-lock.json samplekotlin/build.gradle.kts samplejava/build.gradle.kts
+          git commit -S -m "chore(release): v${{ steps.get_version.outputs.version }} [skip ci]"
+
+      - name: Generate Changelog
+        if: steps.get_version.outputs.changed == 'true'
+        id: changelog
+        uses: TriPSs/conventional-changelog-action@v5
+        with:
+          github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          git-user-name: axeptio-release-bot
+          git-user-email: ${{ secrets.BOT_EMAIL }}
+          skip-version-file: true
+          skip-commit: true
+          skip-tag: true
+          git-push: false
+          version: ${{ steps.get_version.outputs.version }}
+          tag-prefix: 'v'
+          output-file: 'CHANGELOG.md'
+
+      - name: Commit Changelog
+        if: steps.get_version.outputs.changed == 'true' && steps.changelog.outputs.skipped != 'true'
+        run: |
+          # Restore git config after changelog action changes it
+          git config --global user.name "axeptio-release-bot"
+          git config --global user.email "${{ secrets.BOT_EMAIL }}"
+          git config --global commit.gpgsign true
+          
+          git add CHANGELOG.md
+          git commit -S -m "docs: update CHANGELOG.md for v${{ steps.get_version.outputs.version }} [skip ci]"
+
+      - name: Create and Push Tag
+        if: steps.get_version.outputs.changed == 'true'
+        run: |
+          # Debug: Show commits that will be pushed
+          echo "=== Commits to be pushed ==="
+          git log origin/master..HEAD --oneline
+          
+          # Debug: Check signature status
+          echo "=== Signature status ==="
+          git log origin/master..HEAD --pretty=format:"%H %G? %GS %GK %s"
+          
+          # Debug: Verify signatures
+          echo "=== Verify signatures ==="
+          git log origin/master..HEAD --show-signature
+          
+          # Create signed tag
+          git tag -s v${{ steps.get_version.outputs.version }} -m "Release v${{ steps.get_version.outputs.version }}"
+          
+          # Push commits and tags (authentication already set up in Check and Clean Existing Tag step)
+          git push origin HEAD:master
+          git push origin v${{ steps.get_version.outputs.version }}
+
+      - name: Create GitHub Release
+        if: steps.get_version.outputs.changed == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          token: ${{ secrets.BOT_GITHUB_TOKEN }}
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: v${{ steps.get_version.outputs.version }}
+          body: ${{ steps.changelog.outputs.clean_changelog }}
+          draft: false
+          prerelease: false
 
   pr-quality-checks:
     name: PR Quality Checks
@@ -201,7 +328,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
