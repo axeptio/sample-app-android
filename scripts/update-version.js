@@ -15,7 +15,9 @@ if (!version) {
 }
 
 // Extract version code from semantic version (major.minor.patch)
-const [major, minor, patch] = version.split('.').map(Number);
+// Handle prerelease versions like "1.0.0-beta.1" by taking only the base version
+const versionWithoutPrerelease = version.split('-')[0]; // "1.0.0-beta.1" -> "1.0.0"
+const [major, minor, patch] = versionWithoutPrerelease.split('.').map(Number);
 const versionCode = major * 10000 + minor * 100 + patch;
 
 console.log(`Updating to version: ${version} (versionCode: ${versionCode})`);
