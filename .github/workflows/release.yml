@@ -37,7 +37,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -150,8 +150,8 @@ jobs:
         run: |
           git config --global commit.gpgsign true
           git config --global tag.gpgsign true
-          git config --global user.signingkey ${{ steps.import_gpg.outputs.keyid }}
-          git config --global gpg.program $(which gpg)
+          git config --global user.signingkey "${{ steps.import_gpg.outputs.keyid }}"
+          git config --global gpg.program "$(which gpg)"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -172,7 +172,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
@@ -212,18 +212,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
           # Set up authentication for tag operations
-          git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git
+          git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
           
           # Check if tag exists locally
-          if git rev-parse v${{ steps.get_version.outputs.version }} >/dev/null 2>&1; then
+          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
             echo "Tag v${{ steps.get_version.outputs.version }} exists locally, deleting..."
-            git tag -d v${{ steps.get_version.outputs.version }}
+            git tag -d "v${{ steps.get_version.outputs.version }}"
           fi
           
           # Check if tag exists remotely and delete it
           if git ls-remote --tags origin | grep -q "refs/tags/v${{ steps.get_version.outputs.version }}"; then
             echo "Tag v${{ steps.get_version.outputs.version }} exists remotely, deleting..."
-            git push origin :refs/tags/v${{ steps.get_version.outputs.version }}
+            git push origin ":refs/tags/v${{ steps.get_version.outputs.version }}"
           fi
 
       - name: Update versions using existing script
@@ -290,7 +290,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.get_version.outputs.changed == 'true'
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
           tag_name: v${{ steps.get_version.outputs.version }}
@@ -328,7 +328,7 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: Cache Gradle packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/caches
