@@ -10,9 +10,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import java.util.ArrayList;
 
-import io.axept.android.library.AxeptioService;
-import io.axept.android.model.AxeptioCookies;
-
 public class MainViewModel extends ViewModel {
 
     private SharedPreferencesRepository prefRepo;
@@ -63,8 +60,12 @@ public class MainViewModel extends ViewModel {
 
         @NonNull
         @Override
+        @SuppressWarnings("unchecked")
         public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-            return (T) new MainViewModel(new SharedPreferencesRepositoryImpl(app));
+            if (modelClass.isAssignableFrom(MainViewModel.class)) {
+                return (T) new MainViewModel(new SharedPreferencesRepositoryImpl(app));
+            }
+            throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass);
         }
     }
 }

@@ -29,10 +29,11 @@ class DebugConsentInfoViewModel(application: Application) : AndroidViewModel(app
         loadDebugInfo()
     }
 
+    @Suppress("SENSELESS_COMPARISON")
     private fun loadDebugInfo() {
         try {
             val axeptioSDK = AxeptioSDK.instance()
-            
+
             // Collect SDK information
             val sdkInfo = SdkInfo(
                 version = BuildConfig.AXEPTIO_SDK_VERSION,
@@ -54,7 +55,7 @@ class DebugConsentInfoViewModel(application: Application) : AndroidViewModel(app
                 val debugInfo = axeptioSDK.getConsentDebugInfo()
                 val tcfString = debugInfo["IABTCF_TCString"] as? String ?: "No TCF string available"
                 val hasConsent = debugInfo.isNotEmpty()
-                
+
                 ConsentInfo(
                     hasConsent = hasConsent,
                     consentString = tcfString,
@@ -80,13 +81,13 @@ class DebugConsentInfoViewModel(application: Application) : AndroidViewModel(app
                         val vendorConsents = axeptioSDK.getVendorConsents()
                         val consentedVendors = axeptioSDK.getConsentedVendors()
                         val refusedVendors = axeptioSDK.getRefusedVendors()
-                        
+
                         // Calculate detailed breakdown
                         val totalCount = vendorConsents.size
                         val consentedCount = consentedVendors.size
                         val refusedCount = refusedVendors.size
                         val calculatedTotal = consentedCount + refusedCount
-                        
+
                         VendorInfo(
                             isAvailable = true,
                             totalVendors = totalCount.toString(),
