@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="samplekotlin">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-09-02T17:47:15.222761Z">
+        <DropdownSelection timestamp="2025-09-09T15:53:29.462152Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/mex_02/.android/avd/Medium_Phone.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/Users/mex_02/.android/avd/Pixel_8.avd" />
             </handle>
           </Target>
         </DropdownSelection>
