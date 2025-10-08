@@ -81,7 +81,7 @@ dependencies {
         implementation(project(":android"))
     } else {
         // CI/CD or production builds - use published SDK
-        implementation("io.axept.android:android-sdk:2.0.8")
+        implementation("io.axept.android:android-sdk:2.0.9")
     }
 
 
