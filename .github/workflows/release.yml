@@ -13,6 +13,11 @@ jobs:
     name: Quality Checks
     runs-on: ubuntu-latest
 
+    env:
+      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+
     permissions:
       contents: read
       actions: read
@@ -54,15 +59,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: |
-          ./gradlew test --stacktrace
+        run: ./gradlew test --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Android lint
-        run: |
-          ./gradlew lint --stacktrace
+        run: ./gradlew lint --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,8 +79,7 @@ jobs:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build debug variants
-        run: |
-          ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -115,13 +117,18 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: quality-checks
-    
+
+    env:
+      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+
     permissions:
       contents: write
       issues: write
       pull-requests: write
       packages: write
-    
+
     steps:
       - name: Audit Secrets SHA256
         run: |
@@ -149,7 +156,7 @@ jobs:
           git_config_global: true
           git_committer_name: axeptio-release-bot
           git_committer_email: ${{ secrets.BOT_EMAIL }}
-      
+
       - name: Configure Git for signed commits
         run: |
           git config --global commit.gpgsign true
@@ -189,8 +196,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Android apps
-        run: |
-          ./gradlew assembleRelease
+        run: ./gradlew assembleRelease --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
@@ -308,6 +314,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
 
+    env:
+      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
+      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+
     permissions:
       contents: read
       actions: read
@@ -353,22 +364,19 @@ jobs:
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
       - name: Run unit tests
-        run: |
-          ./gradlew test --stacktrace
+        run: ./gradlew test --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Android lint
-        run: |
-          ./gradlew lint --stacktrace
+        run: ./gradlew lint --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build all variants
-        run: |
-          ./gradlew assembleDebug assembleRelease --stacktrace
+        run: ./gradlew assembleDebug assembleRelease --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
