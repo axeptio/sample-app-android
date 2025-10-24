@@ -1,14 +1,44 @@
 package io.axept.samplekotlin.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.axept.android.library.WidgetType
 import io.axept.samplekotlin.config.ConfigurationManager
 import io.axept.samplekotlin.config.CustomerConfiguration
 
@@ -30,11 +61,11 @@ fun ConfigurationScreen(
     val context = LocalContext.current
     val configManager = remember { ConfigurationManager.getInstance(context) }
     val uiState by viewModel.uiState.collectAsState()
-    
+
     LaunchedEffect(Unit) {
         viewModel.loadCurrentConfiguration(configManager)
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,7 +98,7 @@ fun ConfigurationScreen(
                     hasCustomConfig = configManager.hasCustomConfiguration
                 )
             }
-            
+
             // Preset Configurations
             item {
                 Text(
@@ -76,19 +107,19 @@ fun ConfigurationScreen(
                     fontWeight = FontWeight.Bold
                 )
             }
-            
+
             items(configManager.presetConfigurations.toList()) { (name, config) ->
                 PresetConfigurationCard(
                     name = name,
                     config = config,
                     isSelected = uiState.selectedPreset == name,
-                    onSelect = { 
+                    onSelect = {
                         viewModel.selectPreset(name)
                         configManager.loadPresetConfiguration(name)
                     }
                 )
             }
-            
+
             // Custom Configuration Section
             item {
                 CustomConfigurationSection(
@@ -96,6 +127,8 @@ fun ConfigurationScreen(
                     onClientIdChange = viewModel::updateClientId,
                     onCookiesVersionChange = viewModel::updateCookiesVersion,
                     onTokenChange = viewModel::updateToken,
+                    onWidgetTypeChange = viewModel::updateWidgetType,
+                    onPrIdChange = viewModel::updatePrId,
                     onServiceChange = viewModel::updateTargetService,
                     onSaveCustomConfig = { viewModel.saveCustomConfiguration(configManager) },
                     onResetToDefault = {
@@ -104,7 +137,7 @@ fun ConfigurationScreen(
                     }
                 )
             }
-            
+
             // Validation Errors
             if (uiState.validationErrors.isNotEmpty()) {
                 item {
@@ -127,7 +160,7 @@ private fun CurrentConfigurationSection(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -142,7 +175,7 @@ private fun CurrentConfigurationSection(
                 ConfigurationDetailRow("Client ID", currentConfig.clientId)
                 ConfigurationDetailRow("Cookies Version", currentConfig.cookiesVersion)
                 ConfigurationDetailRow("Token", currentConfig.token ?: "None")
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -197,9 +230,9 @@ private fun PresetConfigurationCard(
                 role = Role.RadioButton
             ),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) 
-                MaterialTheme.colorScheme.primaryContainer 
-            else 
+            containerColor = if (isSelected)
+                MaterialTheme.colorScheme.primaryContainer
+            else
                 MaterialTheme.colorScheme.secondaryContainer
         )
     ) {
@@ -213,9 +246,9 @@ private fun PresetConfigurationCard(
                 selected = isSelected,
                 onClick = null
             )
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = name,
@@ -238,6 +271,8 @@ private fun CustomConfigurationSection(
     onClientIdChange: (String) -> Unit,
     onCookiesVersionChange: (String) -> Unit,
     onTokenChange: (String) -> Unit,
+    onWidgetTypeChange: (WidgetType) -> Unit,
+    onPrIdChange: (String) -> Unit,
     onServiceChange: (io.axept.android.library.AxeptioService) -> Unit,
     onSaveCustomConfig: () -> Unit,
     onResetToDefault: () -> Unit
@@ -249,7 +284,7 @@ private fun CustomConfigurationSection(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        
+
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
@@ -267,7 +302,7 @@ private fun CustomConfigurationSection(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-                
+
                 OutlinedTextField(
                     value = uiState.customCookiesVersion,
                     onValueChange = onCookiesVersionChange,
@@ -275,7 +310,7 @@ private fun CustomConfigurationSection(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-                
+
                 OutlinedTextField(
                     value = uiState.customToken,
                     onValueChange = onTokenChange,
@@ -283,7 +318,19 @@ private fun CustomConfigurationSection(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
-                
+
+                WidgetTypeDropdown(uiState, onWidgetTypeChange)
+
+                if (uiState.widgetType != WidgetType.PRODUCTION) {
+                    OutlinedTextField(
+                        value = uiState.prId,
+                        onValueChange = onPrIdChange,
+                        label = { Text("PR ID") },
+                        modifier = Modifier.fillMaxWidth(),
+                        singleLine = true
+                    )
+                }
+
                 // Service Selection
                 Column(modifier = Modifier.selectableGroup()) {
                     Text(
@@ -291,7 +338,7 @@ private fun CustomConfigurationSection(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
-                    
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -313,7 +360,7 @@ private fun CustomConfigurationSection(
                             modifier = Modifier.padding(start = 16.dp)
                         )
                     }
-                    
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -336,7 +383,7 @@ private fun CustomConfigurationSection(
                         )
                     }
                 }
-                
+
                 // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -348,7 +395,7 @@ private fun CustomConfigurationSection(
                     ) {
                         Text("Reset to Default")
                     }
-                    
+
                     Button(
                         onClick = onSaveCustomConfig,
                         modifier = Modifier.weight(1f)
@@ -379,12 +426,54 @@ private fun ValidationErrorsSection(errors: List<String>) {
                 color = Color(0xFFD32F2F),
                 fontWeight = FontWeight.Bold
             )
-            
+
             errors.forEach { error ->
                 Text(
                     text = "• $error",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color(0xFFD32F2F)
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WidgetTypeDropdown(
+    uiState: ConfigurationUiState,
+    onWidgetTypeChange: (WidgetType) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
+        TextField(
+            value = uiState.widgetType.name,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text("Widget type") },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth()
+        )
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            WidgetType.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.name) },
+                    onClick = {
+                        expanded = false
+                        onWidgetTypeChange(option)
+                    }
                 )
             }
         }

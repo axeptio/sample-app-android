@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.gms.google-services")
     // OWASP dependency check removed - using Dependabot for vulnerability scanning
     // id("org.owasp.dependencycheck")
@@ -81,7 +82,7 @@ dependencies {
         implementation(project(":android"))
     } else {
         // CI/CD or production builds - use published SDK
-        implementation("io.axept.android:android-sdk:2.0.8")
+        implementation("io.axept.android:android-sdk:2.0.9")
     }
 
 

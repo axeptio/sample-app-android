@@ -2,6 +2,7 @@ package io.axept.samplekotlin.screen
 
 import androidx.lifecycle.ViewModel
 import io.axept.android.library.AxeptioService
+import io.axept.android.library.WidgetType
 import io.axept.samplekotlin.config.ConfigurationManager
 import io.axept.samplekotlin.config.CustomerConfiguration
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,8 @@ data class ConfigurationUiState(
     val customClientId: String = "",
     val customCookiesVersion: String = "",
     val customToken: String = "",
+    val widgetType: WidgetType = WidgetType.PRODUCTION,
+    val prId: String = "",
     val customTargetService: AxeptioService = AxeptioService.BRANDS,
     val validationErrors: List<String> = emptyList()
 )
@@ -29,6 +32,8 @@ class ConfigurationViewModel : ViewModel() {
             customClientId = currentConfig.clientId,
             customCookiesVersion = currentConfig.cookiesVersion,
             customToken = currentConfig.token ?: "",
+            widgetType = currentConfig.widgetType,
+            prId = currentConfig.prId ?: "",
             customTargetService = currentConfig.targetService,
             validationErrors = emptyList(),
             selectedPreset = findMatchingPreset(currentConfig, configManager)
@@ -74,6 +79,23 @@ class ConfigurationViewModel : ViewModel() {
             validationErrors = emptyList()
         )
     }
+
+    fun updateWidgetType(widgetType: WidgetType) {
+        _uiState.value = _uiState.value.copy(
+            widgetType = widgetType,
+            prId = if(widgetType == WidgetType.PRODUCTION) "" else _uiState.value.prId,
+            selectedPreset = null,
+            validationErrors = emptyList()
+        )
+    }
+
+    fun updatePrId(prId: String) {
+        _uiState.value = _uiState.value.copy(
+            prId = prId,
+            selectedPreset = null,
+            validationErrors = emptyList()
+        )
+    }
     
     fun updateTargetService(service: AxeptioService) {
         _uiState.value = _uiState.value.copy(
@@ -89,7 +111,9 @@ class ConfigurationViewModel : ViewModel() {
         val customConfig = CustomerConfiguration(
             clientId = currentState.customClientId,
             cookiesVersion = currentState.customCookiesVersion,
-            token = if (currentState.customToken.isBlank()) null else currentState.customToken,
+            token = currentState.customToken.ifBlank { null },
+            widgetType = currentState.widgetType,
+            prId = currentState.prId.ifBlank { null },
             targetService = currentState.customTargetService
         )
         

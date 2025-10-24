@@ -34,6 +34,7 @@ import io.axept.android.library.Axeptio;
 import io.axept.android.library.AxeptioEventListener;
 import io.axept.android.library.AxeptioSDK;
 import io.axept.android.library.AxeptioService;
+import io.axept.android.library.WidgetType;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 targetService,
                 BuildConfig.AXEPTIO_CLIENT_ID,
                 BuildConfig.AXEPTIO_COOKIES_VERSION,
+                null,
+                WidgetType.PRODUCTION,
                 null
         );
         setGoogleConsent();

@@ -1,17 +1,9 @@
 package io.axept.samplekotlin
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.navigation.compose.rememberNavController
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus
 import com.google.firebase.analytics.FirebaseAnalytics.ConsentType
@@ -20,12 +12,9 @@ import io.axept.android.googleconsent.GoogleConsentStatus
 import io.axept.android.googleconsent.GoogleConsentType
 import io.axept.android.library.AxeptioEventListener
 import io.axept.android.library.AxeptioSDK
-import io.axept.android.library.AxeptioService
-import io.axept.samplekotlin.navigation.AppNavHost
-import io.axept.samplekotlin.screen.MainScreen
-import io.axept.samplekotlin.screen.MainViewModel
-import io.axept.samplekotlin.ui.theme.SampleKotlinTheme
 import io.axept.samplekotlin.config.ConfigurationManager
+import io.axept.samplekotlin.navigation.AppNavHost
+import io.axept.samplekotlin.ui.theme.SampleKotlinTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -53,7 +42,9 @@ class MainActivity : ComponentActivity() {
             targetService = targetService,
             clientId = currentConfig.clientId,
             cookiesVersion = currentConfig.cookiesVersion,
-            token = currentConfig.token
+            token = currentConfig.token,
+            widgetType = currentConfig.widgetType,
+            prId = currentConfig.prId,
         )
 
         // Google consent v2 implementation
