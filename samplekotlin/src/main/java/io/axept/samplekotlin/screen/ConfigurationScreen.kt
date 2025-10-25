@@ -321,11 +321,12 @@ private fun CustomConfigurationSection(
 
                 WidgetTypeDropdown(uiState, onWidgetTypeChange)
 
-                if (uiState.widgetType != WidgetType.PRODUCTION) {
+                if (uiState.widgetType == WidgetType.PR) {
                     OutlinedTextField(
                         value = uiState.prId,
                         onValueChange = onPrIdChange,
-                        label = { Text("PR ID") },
+                        label = { Text("PR UUID") },
+                        placeholder = { Text("eg. 59026e8d-b110-5452-afbe-6cb99c4e202a") },
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true
                     )

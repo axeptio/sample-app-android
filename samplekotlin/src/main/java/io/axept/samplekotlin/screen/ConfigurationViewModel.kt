@@ -21,13 +21,13 @@ data class ConfigurationUiState(
 )
 
 class ConfigurationViewModel : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(ConfigurationUiState())
     val uiState: StateFlow<ConfigurationUiState> = _uiState.asStateFlow()
-    
+
     fun loadCurrentConfiguration(configManager: ConfigurationManager) {
         val currentConfig = configManager.currentConfiguration
-        
+
         _uiState.value = _uiState.value.copy(
             customClientId = currentConfig.clientId,
             customCookiesVersion = currentConfig.cookiesVersion,
@@ -39,23 +39,23 @@ class ConfigurationViewModel : ViewModel() {
             selectedPreset = findMatchingPreset(currentConfig, configManager)
         )
     }
-    
+
     private fun findMatchingPreset(config: CustomerConfiguration, configManager: ConfigurationManager): String? {
         return configManager.presetConfigurations.entries.find { (_, presetConfig) ->
             presetConfig.clientId == config.clientId &&
-            presetConfig.cookiesVersion == config.cookiesVersion &&
-            presetConfig.token == config.token &&
-            presetConfig.targetService == config.targetService
+                    presetConfig.cookiesVersion == config.cookiesVersion &&
+                    presetConfig.token == config.token &&
+                    presetConfig.targetService == config.targetService
         }?.key
     }
-    
+
     fun selectPreset(presetName: String) {
         _uiState.value = _uiState.value.copy(
             selectedPreset = presetName,
             validationErrors = emptyList()
         )
     }
-    
+
     fun updateClientId(clientId: String) {
         _uiState.value = _uiState.value.copy(
             customClientId = clientId,
@@ -63,7 +63,7 @@ class ConfigurationViewModel : ViewModel() {
             validationErrors = emptyList()
         )
     }
-    
+
     fun updateCookiesVersion(cookiesVersion: String) {
         _uiState.value = _uiState.value.copy(
             customCookiesVersion = cookiesVersion,
@@ -71,7 +71,7 @@ class ConfigurationViewModel : ViewModel() {
             validationErrors = emptyList()
         )
     }
-    
+
     fun updateToken(token: String) {
         _uiState.value = _uiState.value.copy(
             customToken = token,
@@ -83,7 +83,7 @@ class ConfigurationViewModel : ViewModel() {
     fun updateWidgetType(widgetType: WidgetType) {
         _uiState.value = _uiState.value.copy(
             widgetType = widgetType,
-            prId = if(widgetType == WidgetType.PRODUCTION) "" else _uiState.value.prId,
+            prId = if(widgetType != WidgetType.PR) "" else _uiState.value.prId,
             selectedPreset = null,
             validationErrors = emptyList()
         )
@@ -96,7 +96,7 @@ class ConfigurationViewModel : ViewModel() {
             validationErrors = emptyList()
         )
     }
-    
+
     fun updateTargetService(service: AxeptioService) {
         _uiState.value = _uiState.value.copy(
             customTargetService = service,
@@ -104,10 +104,10 @@ class ConfigurationViewModel : ViewModel() {
             validationErrors = emptyList()
         )
     }
-    
+
     fun saveCustomConfiguration(configManager: ConfigurationManager) {
         val currentState = _uiState.value
-        
+
         val customConfig = CustomerConfiguration(
             clientId = currentState.customClientId,
             cookiesVersion = currentState.customCookiesVersion,
@@ -116,9 +116,9 @@ class ConfigurationViewModel : ViewModel() {
             prId = currentState.prId.ifBlank { null },
             targetService = currentState.customTargetService
         )
-        
+
         val validationErrors = configManager.validateConfiguration(customConfig)
-        
+
         if (validationErrors.isEmpty()) {
             configManager.currentConfiguration = customConfig
             _uiState.value = currentState.copy(
