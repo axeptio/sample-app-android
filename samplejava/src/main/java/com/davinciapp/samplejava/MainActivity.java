@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
                 BuildConfig.AXEPTIO_COOKIES_VERSION,
                 null,
                 WidgetType.PRODUCTION,
-                null
+                null,
+                180
         );
         setGoogleConsent();
 
