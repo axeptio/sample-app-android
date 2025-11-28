@@ -3,6 +3,12 @@ package io.axept.samplekotlin
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics.ConsentStatus
@@ -16,6 +22,10 @@ import io.axept.samplekotlin.config.ConfigurationManager
 import io.axept.samplekotlin.navigation.AppNavHost
 import io.axept.samplekotlin.ui.theme.SampleKotlinTheme
 
+val LocalAppTextFieldColors = staticCompositionLocalOf<TextFieldColors?> {
+    null
+}
+
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,14 +38,23 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SampleKotlinTheme {
-                val navController = rememberNavController()
-                AppNavHost(
-                    navController = navController,
-                    targetService = targetService
-                )
+                CompositionLocalProvider(
+                    LocalAppTextFieldColors provides OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.Black,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        focusedLabelColor = Color.Black,
+                        cursorColor = Color.Black,
+                    )
+                ) {
+                    val navController = rememberNavController()
+
+                    AppNavHost(
+                        navController = navController,
+                        targetService = targetService
+                    )
+                }
             }
         }
-
 
         AxeptioSDK.instance().initialize(
             activity = this,
@@ -45,6 +64,8 @@ class MainActivity : ComponentActivity() {
             token = currentConfig.token,
             widgetType = currentConfig.widgetType,
             prId = currentConfig.prId,
+            consentExpirationDays = currentConfig.consentExpirationDays.toInt(),
+            shouldUpdateConsentExpiration = currentConfig.consentExpirationAccepted,
         )
 
         // Google consent v2 implementation

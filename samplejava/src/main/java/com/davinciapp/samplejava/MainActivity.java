@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity {
                 null,
                 WidgetType.PRODUCTION,
                 null,
-                180
+                190,
+                false
         );
         setGoogleConsent();
 

@@ -6,13 +6,17 @@ import io.axept.android.library.AxeptioService
 import androidx.core.content.edit
 import io.axept.android.library.WidgetType
 
+const val CONSENT_EXPIRATION_DAYS = "190"
+
 data class CustomerConfiguration(
     val clientId: String,
     val cookiesVersion: String,
     val token: String?,
     val widgetType: WidgetType = WidgetType.PRODUCTION,
     val prId: String?,
-    val targetService: AxeptioService
+    val targetService: AxeptioService,
+    val consentExpirationDays: String = CONSENT_EXPIRATION_DAYS,
+    val consentExpirationAccepted: Boolean = false,
 ) {
     val displayName: String
         get() = "${if (targetService == AxeptioService.BRANDS) "Brands" else "TCF"}: $cookiesVersion"
@@ -42,6 +46,8 @@ class ConfigurationManager private constructor(context: Context) {
         const val TOKEN = "axeptio.config.token"
         const val WIDGET_TYPE = "axeptio.config.widgetType"
         const val PR_ID = "axeptio.config.prId"
+        const val CONSENT_EXPIRATION_DAYS = "axeptio.config.consentExpirationDays"
+        const val CONSENT_EXPIRATION_ACCEPTED = "axeptio.config.consentExpirationAccepted"
         const val TARGET_SERVICE = "axeptio.config.targetService"
         const val HAS_CUSTOM_CONFIGURATION = "axeptio.config.hasCustom"
     }
@@ -91,6 +97,21 @@ class ConfigurationManager private constructor(context: Context) {
                 sharedPrefs.getInt(Keys.TARGET_SERVICE, AxeptioService.BRANDS.ordinal)
             val targetService = AxeptioService.entries.toTypedArray()
                 .getOrElse(serviceOrdinal) { AxeptioService.BRANDS }
+            val consentExpirationDays = sharedPrefs.getString(
+                Keys.CONSENT_EXPIRATION_DAYS,
+                CONSENT_EXPIRATION_DAYS
+            ) ?: CONSENT_EXPIRATION_DAYS
+            val consentExpirationAccepted = sharedPrefs.getBoolean(
+                Keys.CONSENT_EXPIRATION_ACCEPTED,
+                false
+            )
+            if (consentExpirationAccepted) {
+                sharedPrefs.edit {
+                    putBoolean(
+                        Keys.CONSENT_EXPIRATION_ACCEPTED, false
+                    )
+                }
+            }
 
             return CustomerConfiguration(
                 clientId = clientId,
@@ -98,7 +119,9 @@ class ConfigurationManager private constructor(context: Context) {
                 token = token?.takeIf { it.isNotEmpty() },
                 widgetType = WidgetType.entries[widgetType],
                 prId = prId?.takeIf { it.isNotEmpty() },
-                targetService = targetService
+                targetService = targetService,
+                consentExpirationDays = consentExpirationDays,
+                consentExpirationAccepted = consentExpirationAccepted,
             )
         }
         set(value) {
@@ -110,6 +133,15 @@ class ConfigurationManager private constructor(context: Context) {
                     .putString(Keys.PR_ID, value.prId)
                     .putInt(Keys.TARGET_SERVICE, value.targetService.ordinal)
                     .putBoolean(Keys.HAS_CUSTOM_CONFIGURATION, true)
+                    .putBoolean(
+                        Keys.CONSENT_EXPIRATION_ACCEPTED, value.consentExpirationAccepted
+                    )
+                if (value.consentExpirationAccepted) {
+                    putString(
+                        Keys.CONSENT_EXPIRATION_DAYS,
+                        value.consentExpirationDays.ifBlank { CONSENT_EXPIRATION_DAYS }
+                    )
+                }
             }
         }
 
@@ -132,6 +164,8 @@ class ConfigurationManager private constructor(context: Context) {
                 .remove(Keys.PR_ID)
                 .remove(Keys.TARGET_SERVICE)
                 .remove(Keys.HAS_CUSTOM_CONFIGURATION)
+                .remove(Keys.CONSENT_EXPIRATION_DAYS)
+                .remove(Keys.CONSENT_EXPIRATION_ACCEPTED)
         }
     }
 

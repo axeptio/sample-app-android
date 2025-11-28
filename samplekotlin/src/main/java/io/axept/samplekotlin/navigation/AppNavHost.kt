@@ -10,8 +10,8 @@ import io.axept.android.library.AxeptioService
 import io.axept.samplekotlin.screen.MainScreen
 import io.axept.samplekotlin.screen.WebViewScreen
 import io.axept.samplekotlin.screen.VendorConsentTestScreen
-import io.axept.samplekotlin.screen.ConfigurationScreen
 import io.axept.samplekotlin.screen.DebugConsentInfoScreen
+import io.axept.samplekotlin.screen.configuration.ConfigurationScreen
 
 @Composable
 internal fun AppNavHost(navController: NavHostController, targetService: AxeptioService) {

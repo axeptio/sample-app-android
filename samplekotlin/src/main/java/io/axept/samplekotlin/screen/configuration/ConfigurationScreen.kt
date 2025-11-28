@@ -1,4 +1,4 @@
-package io.axept.samplekotlin.screen
+package io.axept.samplekotlin.screen.configuration
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -48,9 +49,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import io.axept.android.library.AxeptioService
 import io.axept.android.library.WidgetType
+import io.axept.samplekotlin.LocalAppTextFieldColors
 import io.axept.samplekotlin.config.ConfigurationManager
 import io.axept.samplekotlin.config.CustomerConfiguration
+import io.axept.samplekotlin.screen.configuration.components.ConsentExpirationSwitch
+import io.axept.samplekotlin.screen.configuration.components.ConsentExpirationTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -129,6 +134,8 @@ fun ConfigurationScreen(
                     onTokenChange = viewModel::updateToken,
                     onWidgetTypeChange = viewModel::updateWidgetType,
                     onPrIdChange = viewModel::updatePrId,
+                    onConsentExpirationChange = viewModel::updateConsentExpiration,
+                    onConsentExpirationAcceptedChange = viewModel::updateConsentExpirationAccepted,
                     onServiceChange = viewModel::updateTargetService,
                     onSaveCustomConfig = { viewModel.saveCustomConfiguration(configManager) },
                     onResetToDefault = {
@@ -273,7 +280,9 @@ private fun CustomConfigurationSection(
     onTokenChange: (String) -> Unit,
     onWidgetTypeChange: (WidgetType) -> Unit,
     onPrIdChange: (String) -> Unit,
-    onServiceChange: (io.axept.android.library.AxeptioService) -> Unit,
+    onConsentExpirationChange: (String) -> Unit,
+    onConsentExpirationAcceptedChange: (Boolean) -> Unit,
+    onServiceChange: (AxeptioService) -> Unit,
     onSaveCustomConfig: () -> Unit,
     onResetToDefault: () -> Unit
 ) {
@@ -300,7 +309,9 @@ private fun CustomConfigurationSection(
                     onValueChange = onClientIdChange,
                     label = { Text("Client ID") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = LocalAppTextFieldColors.current
+                        ?: OutlinedTextFieldDefaults.colors()
                 )
 
                 OutlinedTextField(
@@ -308,7 +319,9 @@ private fun CustomConfigurationSection(
                     onValueChange = onCookiesVersionChange,
                     label = { Text("Cookies Version") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = LocalAppTextFieldColors.current
+                        ?: OutlinedTextFieldDefaults.colors()
                 )
 
                 OutlinedTextField(
@@ -316,8 +329,21 @@ private fun CustomConfigurationSection(
                     onValueChange = onTokenChange,
                     label = { Text("Token (Optional)") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    colors = LocalAppTextFieldColors.current
+                        ?: OutlinedTextFieldDefaults.colors()
                 )
+
+                ConsentExpirationSwitch(
+                    uiState = uiState,
+                    onConsentExpirationAcceptedChange = onConsentExpirationAcceptedChange
+                )
+                if (uiState.consentExpirationAccepted) {
+                    ConsentExpirationTextField(
+                        uiState = uiState,
+                        onConsentExpirationChange = onConsentExpirationChange
+                    )
+                }
 
                 WidgetTypeDropdown(uiState, onWidgetTypeChange)
 
@@ -328,7 +354,9 @@ private fun CustomConfigurationSection(
                         label = { Text("PR UUID") },
                         placeholder = { Text("eg. 59026e8d-b110-5452-afbe-6cb99c4e202a") },
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true
+                        singleLine = true,
+                        colors = LocalAppTextFieldColors.current
+                            ?: OutlinedTextFieldDefaults.colors()
                     )
                 }
 
@@ -344,16 +372,16 @@ private fun CustomConfigurationSection(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = (uiState.customTargetService == io.axept.android.library.AxeptioService.BRANDS),
-                                onClick = { onServiceChange(io.axept.android.library.AxeptioService.BRANDS) },
+                                selected = (uiState.customTargetService == AxeptioService.BRANDS),
+                                onClick = { onServiceChange(AxeptioService.BRANDS) },
                                 role = Role.RadioButton
                             )
                             .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (uiState.customTargetService == io.axept.android.library.AxeptioService.BRANDS),
-                            onClick = null
+                            selected = (uiState.customTargetService == AxeptioService.BRANDS),
+                            onClick = null,
                         )
                         Text(
                             text = "Brands",
@@ -366,15 +394,15 @@ private fun CustomConfigurationSection(
                         modifier = Modifier
                             .fillMaxWidth()
                             .selectable(
-                                selected = (uiState.customTargetService == io.axept.android.library.AxeptioService.PUBLISHERS_TCF),
-                                onClick = { onServiceChange(io.axept.android.library.AxeptioService.PUBLISHERS_TCF) },
+                                selected = (uiState.customTargetService == AxeptioService.PUBLISHERS_TCF),
+                                onClick = { onServiceChange(AxeptioService.PUBLISHERS_TCF) },
                                 role = Role.RadioButton
                             )
                             .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = (uiState.customTargetService == io.axept.android.library.AxeptioService.PUBLISHERS_TCF),
+                            selected = (uiState.customTargetService == AxeptioService.PUBLISHERS_TCF),
                             onClick = null
                         )
                         Text(
@@ -394,7 +422,7 @@ private fun CustomConfigurationSection(
                         onClick = onResetToDefault,
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Reset to Default")
+                        Text("Reset to Default", color = Color.Black)
                     }
 
                     Button(
@@ -461,7 +489,13 @@ fun WidgetTypeDropdown(
             },
             modifier = Modifier
                 .menuAnchor()
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            colors = ExposedDropdownMenuDefaults.textFieldColors(
+                focusedIndicatorColor = Color.Black,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = Color.Black,
+                cursorColor = Color.Black,
+            )
         )
 
         ExposedDropdownMenu(
@@ -474,7 +508,7 @@ fun WidgetTypeDropdown(
                     onClick = {
                         expanded = false
                         onWidgetTypeChange(option)
-                    }
+                    },
                 )
             }
         }
