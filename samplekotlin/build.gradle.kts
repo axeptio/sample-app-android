@@ -16,8 +16,8 @@ android {
         minSdk = 26
         targetSdk = 35
 
-        versionCode = 20008
-        versionName = "2.0.8"
+        versionCode = 20200
+        versionName = "2.2.0-beta.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -79,7 +79,7 @@ dependencies {
         implementation(project(":android"))
     } else {
         // CI/CD or production builds - use published SDK
-        implementation("io.axept.android:android-sdk:2.0.9")
+        implementation("io.axept.android:android-sdk:2.2.0-beta.1")
     }
 
 

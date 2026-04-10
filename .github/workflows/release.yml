@@ -242,11 +242,11 @@ jobs:
           # Update package.json version (no git operations)
           npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
           
-          # Update Android versions using existing script (already handles both sample apps)
+          # Update Android version in the Kotlin sample app
           node scripts/update-version.js ${{ steps.get_version.outputs.version }}
-          
+
           # Commit all version updates in one signed commit
-          git add package.json package-lock.json samplekotlin/build.gradle.kts samplejava/build.gradle.kts
+          git add package.json package-lock.json samplekotlin/build.gradle.kts
           git commit -S -m "chore(release): v${{ steps.get_version.outputs.version }} [skip ci]"
 
       - name: Generate Changelog

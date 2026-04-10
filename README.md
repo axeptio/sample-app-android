@@ -2,8 +2,18 @@
 
 # Axeptio Android SDK Documentation
 
+> ## 🚧 Beta branch — `2.2.0-beta.1`
+>
+> You are on the `release/2.2.0-beta.1` branch of the sample app, aligned with **Axeptio Android SDK `2.2.0-beta.1`**.
+>
+> **Breaking changes vs `2.0.x` / `2.1.x`:**
+> - The `samplejava/` module has been **removed**. The SDK dropped Java language support (MSK-160); only the Kotlin + Compose sample ships on this branch. Java integration snippets throughout this README are kept as reference for Java consumers, but there is no compiled Java sample to run.
+> - The sample now exercises the full `initialize(..., widgetType, prId, consentExpirationDays, shouldUpdateConsentExpiration)` signature and registers `setForceShowConsentDebug()` — see [`MainActivity.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/MainActivity.kt).
+> - A new Compose integration demo using the `AxeptioStore` StateFlow API is available at [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt).
+>
+> For the stable sample and full Java support, use the [`master`](https://github.com/axeptio/sample-app-android/tree/master) branch (SDK `2.0.x` / `2.1.x`).
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Java Integration](https://img.shields.io/badge/Integration-Java%20%26%20XML-blue)](https://github.com/axeptio/sample-app-android/tree/main/samplejava) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/main/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/release/2.2.0-beta.1/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
  
 
 
@@ -32,11 +42,7 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 <br><br>
 
 ## Overview
-This project includes two modules:
-- `samplejava`: Demonstrates how to use the Axeptio SDK with Java and XML.
-- `samplekotlin`: Shows the integration of the Axeptio SDK with Kotlin and Compose, including advanced debugging features and configuration management.
-
-Both modules can be built using either the **brands** or **publishers** variants, depending on your specific needs.
+On this beta branch the repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.2.0-beta.1` with Kotlin and Jetpack Compose, including the new `AxeptioStore` reactive API, `setForceShowConsentDebug()`, and the new `onError` listener callback. The module can be built using either the **brands** or **publishers** variants.
 
 ### Sample App Features
 The `samplekotlin` module includes additional debugging and testing capabilities:

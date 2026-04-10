@@ -53,10 +53,15 @@ class MainActivity : ComponentActivity() {
             targetService = targetService,
             clientId = currentConfig.clientId,
             cookiesVersion = currentConfig.cookiesVersion,
-            token = currentConfig.token
+            token = currentConfig.token,
+            widgetType = currentConfig.widgetType,
+            prId = currentConfig.prId,
+            consentExpirationDays = currentConfig.consentExpirationDays,
+            shouldUpdateConsentExpiration = currentConfig.shouldUpdateConsentExpiration,
         )
 
-        // Google consent v2 implementation
+        AxeptioSDK.instance().setForceShowConsentDebug(currentConfig.forceShowConsent)
+
         AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
             override fun onGoogleConsentModeUpdate(consentMap: Map<GoogleConsentType, GoogleConsentStatus>) {
                 val firebaseConsentMap = consentMap.entries.associate { (type, status) ->
@@ -75,6 +80,10 @@ class MainActivity : ComponentActivity() {
                     firebaseConsentType to firebaseConsentStatus
                 }
                 Firebase.analytics.setConsent(firebaseConsentMap)
+            }
+
+            override fun onError(message: String) {
+                Log.e(TAG, "Axeptio SDK error: $message")
             }
         })
     }

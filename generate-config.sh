@@ -4,7 +4,6 @@
 ENVIRONMENT=${ENVIRONMENT:-development}
 
 # Define target directories
-SAMPLEJAVA_DIR="samplejava"
 SAMPLEKOTLIN_DIR="samplekotlin"
 TEMPLATE_FILE="google-services.json.template"
 
@@ -53,8 +52,7 @@ echo "Project: $GOOGLE_PROJECT"
 echo "API Key: ${GOOGLE_API_KEY:0:10}..."
 echo ""
 
-# Generate config for both directories
-generate_config "$SAMPLEJAVA_DIR"
+# Generate config for the Kotlin sample
 generate_config "$SAMPLEKOTLIN_DIR"
 
 echo ""
@@ -63,7 +61,7 @@ echo "All google-services.json files generated successfully!"
 # Optional: Verify the generated files
 echo ""
 echo "Verification:"
-for dir in "$SAMPLEJAVA_DIR" "$SAMPLEKOTLIN_DIR"; do
+for dir in "$SAMPLEKOTLIN_DIR"; do
     if [ -f "$dir/google-services.json" ]; then
         echo "✓ $dir/google-services.json exists"
         # Show project_id from generated file
