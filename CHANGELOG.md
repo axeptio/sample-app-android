@@ -1,3 +1,20 @@
+# 2.2.0-beta.1 (2026-04-10)
+
+Beta release aligning the public sample app with Axeptio Android SDK `2.2.0-beta.1`.
+
+### ⚠ BREAKING CHANGES
+
+* **sample-java:** the Java sample module has been removed. The SDK dropped Java language support (MSK-160); consumers needing a Java reference should stay on the `master` branch (SDK 2.0.x / 2.1.x).
+
+### Features
+
+* **sdk:** bump `io.axept.android:android-sdk` to `2.2.0-beta.1`.
+* **sample-kotlin:** pass the full `initialize(...)` signature including `widgetType`, `prId`, `consentExpirationDays`, and `shouldUpdateConsentExpiration`.
+* **sample-kotlin:** register `setForceShowConsentDebug()` and the new `onError` listener callback (new in 2.2.0-beta.1).
+* **sample-kotlin:** add `AxeptioStoreDemoScreen` showcasing the new StateFlow-based `AxeptioStore` in Jetpack Compose, reachable from a new entry on the main screen.
+
+---
+
 ## [1.0.0-beta.2](https://github.com/axeptio/sample-app-android/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-09-02)
 
 

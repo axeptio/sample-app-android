@@ -26,11 +26,7 @@ console.log(`Updating to version: ${version} (versionCode: ${versionCode})`);
 const kotlinBuildFile = path.join(__dirname, '../samplekotlin/build.gradle.kts');
 updateBuildFile(kotlinBuildFile, version, versionCode);
 
-// Update Java sample app  
-const javaBuildFile = path.join(__dirname, '../samplejava/build.gradle.kts');
-updateBuildFile(javaBuildFile, version, versionCode);
-
-console.log('✅ Version updated successfully in both sample apps');
+console.log('✅ Version updated successfully in the Kotlin sample app');
 
 function updateBuildFile(filePath, version, versionCode) {
   try {
