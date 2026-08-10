@@ -142,7 +142,7 @@ To test SDK changes using a cookie configuration from the production backoffice,
 
 To test the version currently in production, instead checkout the `sample-app-android repository`, configure the widget, and in `build.gradle.kts` set the desired SDK version, for example: 
 ```gradle
-implementation("io.axept.android:android-sdk:2.0.6")
+implementation("io.axept.android:android-sdk:2.4.0")
 ```
 To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
 ```kotlin
@@ -362,7 +362,6 @@ For more detailed information about the stored values, cookies, and how to handl
 ## Show Consent Popup on Demand
 You can trigger the consent popup to open on demand at any point in your application by using the following methods.
 
-- **Kotlin**:
 ```kotlin
 // Show the consent popup on demand
 AxeptioSDK.instance().showConsentScreen(
@@ -436,7 +435,6 @@ No additional configuration is needed on your side if you are using the official
 This feature is available exclusively for **Publishers** service.
 
 The SDK provides a helper function to append the `axeptio_token` query parameter to any URL. You can either specify a custom user token or use the token currently stored in the SDK.
-- **Kotlin**:
 ```kotlin
 // Append the Axeptio token to a URL
 AxeptioSDK.instance().appendAxeptioToken(
@@ -449,7 +447,6 @@ This will return: `https://myurl.com?axeptio_token=[token]`
 <br><br><br>
 ## Clear User's Consent Choices
 To clear the user’s consent choices, you can use the following method. Please note that this operation is asynchronous, so you should use the `AxeptioEventListener.onConsentCleared()` method to be notified when the user’s consent choices have been cleared from SharedPreferences.
-- **Kotlin**
 ```kotlin
 // Clear the user's consent choices
 AxeptioSDK.instance().clearConsents()
@@ -613,7 +610,6 @@ These APIs allow you to retrieve and analyze vendor consent information in TCF m
 
 ##### Get All Vendor Consents
 Returns a map of all vendor IDs with their consent status:
-- **Kotlin**:
 ```kotlin
 try {
     val vendorConsents: Map<Int, Boolean> = AxeptioSDK.instance().getVendorConsents()
@@ -630,7 +626,6 @@ try {
 
 ##### Get Consented Vendors List
 Returns only the vendor IDs that have been consented to:
-- **Kotlin**:
 ```kotlin
 try {
     val consentedVendors: List<Int> = AxeptioSDK.instance().getConsentedVendors()
@@ -647,7 +642,6 @@ try {
 
 ##### Get Refused Vendors List
 Returns only the vendor IDs that have been refused:
-- **Kotlin**:
 ```kotlin
 try {
     val refusedVendors: List<Int> = AxeptioSDK.instance().getRefusedVendors()
@@ -664,7 +658,6 @@ try {
 
 ##### Check Individual Vendor Consent
 Check if a specific vendor has consent:
-- **Kotlin**:
 ```kotlin
 try {
     val vendorId = 755 // Example vendor ID
@@ -688,7 +681,6 @@ For debugging and detailed consent analysis:
 
 ##### Get Consent Debug Information
 Returns detailed consent information including TCF strings and raw data:
-- **Kotlin**:
 ```kotlin
 try {
     val debugInfo: Map<String, Any?> = AxeptioSDK.instance().getConsentDebugInfo()
