@@ -2,9 +2,9 @@
 
 # Axeptio Android SDK Documentation
 
-> **Aligned with Axeptio Android SDK `2.2.0-beta.1`.** The `samplejava/` module has been removed — the SDK dropped Java language support (MSK-160), so only the Kotlin + Compose sample ships here.
+> **Aligned with Axeptio Android SDK `2.4.0`.** This repository ships a single module — `samplekotlin` (Kotlin + Jetpack Compose). The `samplejava/` module was removed when the SDK dropped Java language support in `2.2.0`; see [Migrating from Java](#migrating-from-java).
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/release/2.2.0-beta.1/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/master/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
  
 
 
@@ -27,19 +27,24 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 12. [Sharing Consents with Other Web Views](#sharing-consents-with-other-web-views)
 13. [Clear User's Consent Choices](#clear-users-consent-choices)
 14. [Google Consent v2](#google-consent-v2)
-15. [TCF Vendor Management APIs](#tcf-vendor-management-apis)
+15. [Codeless Consent Forwarding to Attribution Partners](#codeless-consent-forwarding-to-attribution-partners)
+16. [Silent CMP Restoration](#silent-cmp-restoration)
+17. [Consent Expiry and Popup Control](#consent-expiry-and-popup-control)
+18. [TCF Vendor Management APIs](#tcf-vendor-management-apis)
+19. [Migrating from Java](#migrating-from-java)
 
 
 <br><br>
 
 ## Overview
-On this beta branch the repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.2.0-beta.1` with Kotlin and Jetpack Compose, including the new `AxeptioStore` reactive API, `setForceShowConsentDebug()`, and the new `onError` listener callback. The module can be built using either the **brands** or **publishers** variants.
+The repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.4.0` with Kotlin and Jetpack Compose. It can be built using either the **brands** or **publishers** variants.
 
 ### Sample App Features
 The `samplekotlin` module includes additional debugging and testing capabilities:
-- **Configuration Management**: Dynamic switching between Brands and Publishers TCF services
-- **Debug Consent Info**: Detailed analysis of TCF consent data and vendor information  
+- **Configuration Management**: Dynamic switching between Brands and Publishers TCF services, plus the `setForceShowConsentDebug()` and `setDisplayPopUpOnEnterForeground()` toggles
+- **Debug Consent Info**: Detailed analysis of TCF consent data, vendor information, and the remaining days before consent expires
 - **Vendor Consent Testing**: Live testing interface for individual vendor consent validation
+- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback
 - **Automation Scripts**: Complete build, deploy, and testing automation
 
 > **⚠️ Note**: The `ConfigurationManager` class is part of the sample application and is not included in the Axeptio SDK. It demonstrates how to implement dynamic configuration switching in your own applications.
@@ -121,8 +126,7 @@ Before proceeding with the integration, ensure that your project is correctly co
 ##### Select the appropriate sample module
 Choose the module corresponding to your preferred programming language and UI framework:
 
-- **samplejava**: Java and XML integration
-- **samplekotlin**: Kotlin and Compose integration
+- **samplekotlin**: Kotlin and Compose integration (the only module — Java support was dropped in SDK `2.2.0`)
 
 ##### Choose your build variant:
 Depending on your use case, select the appropriate build variant:
@@ -246,13 +250,13 @@ After adding the repository, include the Axeptio SDK as a dependency in your pro
  - **Kotlin DSL**
 ```kotlin
 dependencies {  
-    implementation("io.axept.android:android-sdk:2.0.6")
+    implementation("io.axept.android:android-sdk:2.4.0")
 }
 ```
  - **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.0.6'
+    implementation 'io.axept.android:android-sdk:2.4.0'
 }
 ```
 For more detailed instructions, refer to the [GitHub Documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package)
@@ -265,8 +269,8 @@ To initialize the Axeptio SDK, you must call the initialization method inside th
 ```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    
-    // Initialize the Axeptio SDK with the required configuration
+
+    // Minimal initialization — every other parameter has a default.
     AxeptioSDK.instance().initialize(
         activity = this@MainActivity,  // Context of the current activity
         targetService = AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
@@ -276,23 +280,32 @@ override fun onCreate(savedInstanceState: Bundle?) {
     )
 }
 ```
-##### Java Implementation
-```java
-@Override
-protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    
-    // Initialize the Axeptio SDK with the required configuration
-    Axeptio axeptio = AxeptioSDK.instance();
-    axeptio.initialize(
-        MainActivity.this,  // Context of the current activity
-        AxeptioService.PUBLISHERS_TCF,  // Choose the target service: Publishers or Brands
-        "your_project_id",  // Replace with your actual project ID
-        "your_configuration_id",  // Provide your configuration ID
-        "optional_consent_token"  // Optional: Provide an existing consent token if available
-    );
-}
+
+##### Full signature
+```kotlin
+AxeptioSDK.instance().initialize(
+    activity = this@MainActivity,
+    targetService = AxeptioService.PUBLISHERS_TCF,
+    clientId = "your_client_id",
+    cookiesVersion = "your_cookies_version",
+    token = null,                            // Optional existing consent token
+    widgetType = WidgetType.PRODUCTION,      // Widget environment to load
+    prId = null,                             // PR/testing ID for non-production widget configurations
+    consentExpirationDays = 190,             // Days before the stored consent expires
+    shouldUpdateConsentExpiration = false,   // Apply a changed expiry to already-stored consent
+)
 ```
+
+| Parameter | Default | Notes |
+|---|---|---|
+| `token` | `null` | Transfers an existing user consent (Publishers). |
+| `widgetType` | `WidgetType.PRODUCTION` | Selects the widget environment. |
+| `prId` | `null` | Used with non-production `widgetType` values to load a specific widget build. |
+| `consentExpirationDays` | `190` | Called `cookiesDurationDays` on iOS. |
+| `shouldUpdateConsentExpiration` | `false` | Called `shouldUpdateCookiesDuration` on iOS. |
+
+> **`targetService` is fixed for the process lifetime.** Calling `initialize()` again with a *different* `targetService` is ignored — the SDK logs a warning and fires `onError(...)`, because its internal repositories are bound to the first service. Restart the app to switch services (this is what the sample's Configuration screen expects).
+
 ##### Consent Popup Behavior
 Once the SDK is initialized, the consent popup will automatically display if the user's consent is either expired or has not yet been registered. The SDK takes care of managing the consent state automatically.
 
@@ -357,37 +370,52 @@ AxeptioSDK.instance().showConsentScreen(
     managePreferencesUseCase = true  // Optional: Manages user preferences when the popup is shown
 )
 ```
-- **Java**
-```java
-// Show the consent popup on demand
-AxeptioSDK.instance().showConsentScreen(
-    activity,  // Pass the activity context
-    true  // Optional: Manages user preferences when the popup is shown
-);
-```
 <br><br><br>
 ## Popup Events
-When the consent popup is closed, an event is triggered. You can listen for this event by setting an `AxeptioEventListener`.
-- **Kotlin**:
+Register an `AxeptioEventListener` to receive SDK events. Every callback has an empty default implementation, so override only the ones you need. Callbacks are delivered on the main thread.
+
 ```kotlin
-// Set an event listener for when the consent popup is closed
 AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
     override fun onPopupClosedEvent() {
-        // Handle the event when the popup is closed
+        // The consent popup has been closed by the user.
+    }
+
+    override fun onGoogleConsentModeUpdate(consentMap: Map<GoogleConsentType, GoogleConsentStatus>) {
+        // Google Consent Mode v2 signals changed. See "Google Consent v2".
+    }
+
+    override fun onCMPRestored() {
+        // Existing, still-valid consent was restored without showing a popup (SDK 2.4.0+).
+        // See "Silent CMP Restoration".
+    }
+
+    override fun onConsentCleared() {
+        // clearConsents() finished removing consent from SharedPreferences.
+    }
+
+    override fun onError(message: String) {
+        // SDK-level error notification (SDK 2.2.0+).
     }
 })
 ```
-- **Java**
-```java
-// Set an event listener for when the consent popup is closed
-AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
-    @Override
-    public void onPopupClosedEvent() {
-        super.onPopupClosedEvent();
-        // Handle the event when the popup is closed
-    }
-});
+
+Use `removeEventListener(listener)` to unregister. More than one listener can be attached at a time — the sample's `AxeptioStore` demo relies on that.
+
+##### Reactive consumption with `AxeptioStore` (Compose)
+`AxeptioStore` implements `AxeptioEventListener` and re-exposes the events as `StateFlow`s for Jetpack Compose. It does not register itself, which keeps the lifecycle explicit:
+
+```kotlin
+val store = remember { AxeptioStore() }
+
+DisposableEffect(store) {
+    AxeptioSDK.instance().setEventListener(store)
+    onDispose { AxeptioSDK.instance().removeEventListener(store) }
+}
+
+val googleConsent by store.googleConsent.collectAsState()
+val error by store.error.collectAsState()
 ```
+It exposes `googleConsent`, `popupClosedEventCount`, `consentClearedEventCount`, `error` and `clearError()`. See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt).
 <br><br><br>
 ## Event source for KPI tracking
 To ensure proper KPI attribution in the back office, the App SDK now adds a specific `event_source` value when emitting TCF events from the WebView.
@@ -437,13 +465,19 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 ```
 <br><br><br>
 ## Google Consent v2
-This section describes how to integrate **Google Consent Mode** with the Axeptio SDK in your Android application.
+This section describes how **Google Consent Mode** works with the Axeptio SDK in your Android application.
+
 ###### Prerequisites:
-Before proceeding, ensure that **Firebase Analytics** is integrated into your Android project.
+Ensure that **Firebase Analytics** is integrated into your Android project.
+
 ###### How It Works:
-When user consent is collected through your **Consent Management Platform (CMP)**, the SDK will automatically set the `IABTCF_EnableAdvertiserConsentMode` key in the **SharedPreferences_** to `true`.
-##### Register to Google Consent Updates
-The **Axeptio SDK** provides a callback method to listen for updates on Google Consent. These updates need to be mapped to the corresponding Firebase models. Once the consent statuses are mapped, you can update Firebase Analytics consent settings using the `setConsent()` method from **Firebase Analytics**.
+When user consent is collected through your **Consent Management Platform (CMP)**, the SDK sets the `IABTCF_EnableAdvertiserConsentMode` key in **SharedPreferences** to `true` and derives the four Google Consent Mode v2 signals (`ANALYTICS_STORAGE`, `AD_STORAGE`, `AD_USER_DATA`, `AD_PERSONALIZATION`).
+
+##### Firebase is updated automatically (SDK 2.3.0+)
+From SDK `2.3.0`, **you no longer need to write any mapping code for Firebase Analytics**. The SDK detects Firebase at runtime and applies the consent signals itself — see [Codeless Consent Forwarding to Attribution Partners](#codeless-consent-forwarding-to-attribution-partners). The last known consent is also replayed at initialization, so the signal reaches Firebase before your app starts it on a warm launch.
+
+##### Register to Google Consent Updates (manual / other destinations)
+The SDK still exposes `onGoogleConsentModeUpdate()` so you can react to consent changes yourself — to feed a destination the SDK doesn't know about, or to keep an explicit mapping under your own control. The example below is the reference Firebase mapping; it is **optional** from `2.3.0` and applying it alongside the codeless path is harmless, since `setConsent()` is idempotent.
 
 ###### Kotlin Example:
 ```kotlin
@@ -473,63 +507,94 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 })
 ```
 
-###### Java Example:
-```java
-// Set an event listener to listen for Google Consent Mode updates
-AxeptioSDK.instance().setEventListener(new AxeptioEventListener() {
-    @Override
-    public void onGoogleConsentModeUpdate(@NonNull Map<GoogleConsentType, ? extends GoogleConsentStatus> consentMap) {
-        super.onGoogleConsentModeUpdate(consentMap);
-
-        // Prepare the Firebase consent map
-        Map<FirebaseAnalytics.ConsentType, FirebaseAnalytics.ConsentStatus> firebaseConsentMap = new HashMap<>();
-
-        // Map the Google consent types and statuses to Firebase consent types
-        for (Map.Entry<GoogleConsentType, ? extends GoogleConsentStatus> entry : consentMap.entrySet()) {
-            FirebaseAnalytics.ConsentType firebaseConsentType = null;
-            switch (entry.getKey()) {
-                case ANALYTICS_STORAGE:
-                    firebaseConsentType = FirebaseAnalytics.ConsentType.ANALYTICS_STORAGE;
-                    break;
-                case AD_STORAGE:
-                    firebaseConsentType = FirebaseAnalytics.ConsentType.AD_STORAGE;
-                    break;
-                case AD_USER_DATA:
-                    firebaseConsentType = FirebaseAnalytics.ConsentType.AD_USER_DATA;
-                    break;
-                case AD_PERSONALIZATION:
-                    firebaseConsentType = FirebaseAnalytics.ConsentType.AD_PERSONALIZATION;
-                    break;
-            }
-
-            FirebaseAnalytics.ConsentStatus firebaseConsentStatus = null;
-            switch ((GoogleConsentStatus) entry.getValue()) {
-                case GRANTED:
-                    firebaseConsentStatus = FirebaseAnalytics.ConsentStatus.GRANTED;
-                    break;
-                case DENIED:
-                    firebaseConsentStatus = FirebaseAnalytics.ConsentStatus.DENIED;
-                    break;
-            }
-
-            // Add the consent status mapping to the Firebase consent map
-            if (firebaseConsentType != null && firebaseConsentStatus != null) {
-                firebaseConsentMap.put(firebaseConsentType, firebaseConsentStatus);
-            }
-        }
-
-        // Update Firebase Analytics with the mapped consent statuses
-        FirebaseAnalytics.getInstance(MainActivity.this).setConsent(firebaseConsentMap);
-    }
-});
-```
 ##### Summary of Steps:
 1. Integrate **Firebase Analytics** into your Android project.
-2. Use the provided listener `onGoogleConsentModeUpdate()` to capture consent updates.
-3. Map the **Google Consent Types** and **Google Consent Statuses** to **Firebase Consent Types-**.
-4. Use Firebase’s `setConsent()` method to update the user’s consent status in Firebase Analytics.
+2. Initialize the Axeptio SDK — Firebase consent is then kept in sync automatically.
+3. *(Optional)* Register `onGoogleConsentModeUpdate()` if you need to mirror the signals to another destination or keep an explicit mapping.
 
-By following these steps, you can ensure that Google Consent Mode is correctly integrated with your application, and Firebase Analytics receives the consent status updates accordingly.
+<br><br><br>
+
+## Codeless Consent Forwarding to Attribution Partners
+*Introduced in SDK `2.3.0`.*
+
+The SDK forwards Google Consent Mode v2 / DMA signals to your analytics and **App Attribution Partner (AAP)** SDKs without any integration code on your side:
+
+| Partner | What it receives |
+|---|---|
+| **Firebase Analytics** | `setConsent()` with the four Consent Mode v2 types |
+| **AppsFlyer** | `consent_data` — `gdpr_applies`, `ad_user_data_enabled`, `ad_personalization_enabled` |
+| **Adjust** | `google_dma` third-party-sharing options — `eea`, `ad_personalization`, `ad_user_data` |
+| **Singular** | `limitDataSharing(...)` — `false` only when `ad_user_data` **and** `ad_personalization` are both granted |
+
+##### How it works
+- Forwarding is set up **inside `initialize()`** — there is no method to call and nothing to configure.
+- Each partner is detected **at runtime by reflection**. If a partner SDK isn't on your classpath, forwarding to it is a **silent no-op**; you only pay for the partners you actually ship.
+- Your only responsibility is to **initialize the partner SDK itself** (e.g. `AppsFlyerLib.getInstance().start(...)`). Do not write consent-forwarding code — the SDK does it.
+- The last persisted consent is **replayed at initialization**, so the signal lands even on a warm launch where the user never sees a popup.
+- `clearConsents()` also clears the persisted Google consent.
+
+> **⚠️ Note on this sample**: `samplekotlin` bundles **Firebase Analytics only**, so Firebase forwarding is the path you can observe here. AppsFlyer, Adjust and Singular are supported by the SDK exactly as described above — add the partner SDK to your own app and forwarding starts working with no further code.
+
+##### Verifying the forwarding
+For Firebase, enable verbose logging and watch logcat:
+```bash
+adb shell setprop log.tag.FA VERBOSE
+adb shell setprop log.tag.FA-SVC VERBOSE
+adb logcat -s FA FA-SVC
+```
+Accept or refuse consent in the Axeptio popup and look for `Setting consent, package, consent: … ad_storage=granted/denied, analytics_storage=…` followed by `Setting DMA consent … ad_user_data=…`. These `setprop` flags reset on device reboot.
+
+<br><br><br>
+
+## Silent CMP Restoration
+*Introduced in SDK `2.4.0`.*
+
+`onCMPRestored()` fires when the SDK silently restores existing, still-valid consent — that is, consent was already stored and **no popup was shown**.
+
+```kotlin
+AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
+    override fun onCMPRestored() {
+        // Stored consent has been restored; getVendorConsents() is populated by now.
+    }
+})
+```
+
+Behaviour worth knowing before you rely on it:
+
+- It fires **once per restoration**, and the SDK restores **more than once per session** — on `initialize()`, when the app returns to the foreground, and after network connectivity is restored. Expect it repeatedly over an app's lifetime, not just at startup. Make your handler idempotent.
+- When restoration succeeds, the consent is readable via `getVendorConsents()` by the time the callback fires, and the matching Google Consent Mode signals are delivered through `onGoogleConsentModeUpdate()` during the same restoration.
+- It is **not** called when the consent popup is displayed — use `onPopupClosedEvent()` for that case — nor after `clearConsents()` invalidates an in-flight restoration.
+
+See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter. Note that `AxeptioStore` does not currently expose a `StateFlow` for this callback, so the sample observes it with a plain `AxeptioEventListener` registered alongside the store — several listeners can be attached at once.
+
+<br><br><br>
+
+## Consent Expiry and Popup Control
+
+##### How long is the current consent valid?
+```kotlin
+val daysLeft = AxeptioSDK.instance().getRemainingDaysForConsent()
+// 0 when no consent is stored, or when it has already expired.
+```
+The expiry window itself is set at initialization via `consentExpirationDays` (default `190`), with `shouldUpdateConsentExpiration` controlling whether an existing consent adopts a changed value.
+
+##### Force the popup during development
+```kotlin
+// Always display the consent screen on showConsentScreen(), ignoring cached consent.
+AxeptioSDK.instance().setForceShowConsentDebug(true)
+```
+Intended for development and QA builds only.
+
+##### Control the foreground popup
+```kotlin
+// SDK default is true. Set to false to suppress auto-display when the app
+// returns to the foreground and drive the presentation timing yourself.
+AxeptioSDK.instance().setDisplayPopUpOnEnterForeground(false)
+```
+
+Both toggles are wired to switches on the sample's **Configuration** screen.
+
+> **Deprecated**: `clearConsent()` is a cross-platform-naming alias kept for iOS parity. Use `clearConsents()`.
 
 <br><br><br>
 
@@ -674,3 +739,21 @@ fun processUserData(vendorId: Int, userData: UserData) {
 <br><br><br>
 For more detailed information, you can visit the [Axeptio documentation](https://support.axeptio.eu/hc/en-gb).
 We hope this guide helps you get started with the Axeptio Android SDK. Good luck with your integration, and thank you for choosing Axeptio!
+
+<br><br><br>
+
+## Migrating from Java
+SDK `2.2.0` made the Axeptio Android SDK **Kotlin-only**. The `samplejava/` module was removed from this repository at the same time.
+
+What changed:
+- `AxeptioSDK.instance()` and `AxeptioAPIRepository.instance()` no longer expose `@JvmStatic` companions.
+- Java call sites compiled against `2.0.x` / `2.1.x` may hit `NoSuchMethodError` at runtime against a newer SDK — **recompile against the release you are using**.
+
+Your options:
+1. **Migrate the integration to Kotlin** (recommended). The Kotlin snippets throughout this README, and the `samplekotlin` module, are the reference integration.
+2. **Keep calling from Java** by going through the singleton instance explicitly:
+   ```java
+   Axeptio axeptio = AxeptioSDK.INSTANCE.instance();
+   ```
+   Note that Kotlin default arguments are not available from Java, so every parameter of `initialize(...)` must be passed explicitly.
+3. **Stay on SDK `2.1.x`**, which retains Java support. Note that it does not receive the fixes and features described in this document.

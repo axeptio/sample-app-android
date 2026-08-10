@@ -1,3 +1,36 @@
+# 2.4.0 (2026-08-10)
+
+Aligns the public sample app with Axeptio Android SDK `2.4.0`, consolidating the `2.2.0`, `2.3.0` and `2.4.0` SDK releases. Supersedes the `release/2.2.0-beta.1` branch, which is now retired.
+
+### ⚠ BREAKING CHANGES
+
+* **sample-java:** the Java sample module has been removed. The SDK dropped Java language support in `2.2.0` (MSK-160) and removed the `@JvmStatic` companions; Java consumers must recompile and either migrate to Kotlin or call `AxeptioSDK.INSTANCE.instance()`. See the "Migrating from Java" section of the README.
+
+### Features
+
+* **sdk:** bump `io.axept.android:android-sdk` to `2.4.0`.
+* **sample-kotlin:** register the `onCMPRestored()` listener callback (new in SDK `2.4.0`) in `MainActivity` and surface a live counter on the `AxeptioStore` demo screen.
+* **sample-kotlin:** wire `setDisplayPopUpOnEnterForeground()` and expose it, alongside `setForceShowConsentDebug()`, as switches on the Configuration screen.
+* **sample-kotlin:** show `getRemainingDaysForConsent()` on the Debug Consent Info screen.
+* **sample-kotlin:** pass the full `initialize(...)` signature including `widgetType`, `prId`, `consentExpirationDays` and `shouldUpdateConsentExpiration`.
+* **sample-kotlin:** add `AxeptioStoreDemoScreen` showcasing the StateFlow-based `AxeptioStore` in Jetpack Compose, reachable from the main screen.
+* **sample-kotlin:** report the real SDK version in the app header instead of "Local Development Build".
+
+### Bug Fixes
+
+* **gradle:** point the GitHub Packages Maven repository at `axeptio/axeptio-android-sdk` instead of the stale `axeptio/tcf-android-sdk` URL.
+* **sample-kotlin:** stop `saveCustomConfiguration()` silently resetting `widgetType`, `prId` and the consent-expiration fields, which the Configuration screen does not expose.
+
+### Documentation
+
+* **readme:** document codeless consent forwarding to Firebase, AppsFlyer, Adjust and Singular (SDK `2.3.0`) — including that it needs no integration code and is a no-op for absent partners.
+* **readme:** document `onCMPRestored()` and its repeat-fire semantics, `getRemainingDaysForConsent()`, `setForceShowConsentDebug()`, `setDisplayPopUpOnEnterForeground()`, and the deprecated `clearConsent()` alias.
+* **readme:** document the full `initialize(...)` signature and that `targetService` is fixed for the process lifetime.
+* **readme:** rewrite the Google Consent v2 section to lead with automatic Firebase forwarding, keeping the manual mapping as the optional explicit path.
+* **readme:** remove the Java code samples, which no longer compile against the SDK, and replace them with a migration section.
+
+---
+
 # 2.2.0-beta.1 (2026-04-10)
 
 Beta release aligning the public sample app with Axeptio Android SDK `2.2.0-beta.1`.

@@ -97,6 +97,8 @@ fun ConfigurationScreen(
                     onCookiesVersionChange = viewModel::updateCookiesVersion,
                     onTokenChange = viewModel::updateToken,
                     onServiceChange = viewModel::updateTargetService,
+                    onForceShowConsentChange = viewModel::updateForceShowConsent,
+                    onDisplayPopUpOnForegroundChange = viewModel::updateDisplayPopUpOnEnterForeground,
                     onSaveCustomConfig = { viewModel.saveCustomConfiguration(configManager) },
                     onResetToDefault = {
                         configManager.resetToDefault()
@@ -239,6 +241,8 @@ private fun CustomConfigurationSection(
     onCookiesVersionChange: (String) -> Unit,
     onTokenChange: (String) -> Unit,
     onServiceChange: (io.axept.android.library.AxeptioService) -> Unit,
+    onForceShowConsentChange: (Boolean) -> Unit,
+    onDisplayPopUpOnForegroundChange: (Boolean) -> Unit,
     onSaveCustomConfig: () -> Unit,
     onResetToDefault: () -> Unit
 ) {
@@ -336,7 +340,22 @@ private fun CustomConfigurationSection(
                         )
                     }
                 }
-                
+
+                // Popup behaviour toggles — both map directly onto SDK calls made in MainActivity.
+                ConfigurationSwitchRow(
+                    label = "Force show consent (debug)",
+                    description = "setForceShowConsentDebug() — always display the popup, ignoring cached consent.",
+                    checked = uiState.forceShowConsent,
+                    onCheckedChange = onForceShowConsentChange
+                )
+
+                ConfigurationSwitchRow(
+                    label = "Show popup on foreground",
+                    description = "setDisplayPopUpOnEnterForeground() — SDK default is on; turn off to control timing yourself.",
+                    checked = uiState.displayPopUpOnEnterForeground,
+                    onCheckedChange = onDisplayPopUpOnForegroundChange
+                )
+
                 // Action Buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -358,6 +377,35 @@ private fun CustomConfigurationSection(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ConfigurationSwitchRow(
+    label: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
     }
 }
 

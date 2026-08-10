@@ -24,10 +24,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import io.axept.android.library.AxeptioEventListener
 import io.axept.android.library.AxeptioSDK
 import io.axept.android.library.AxeptioStore
 import io.axept.samplekotlin.MainActivity
@@ -35,20 +38,36 @@ import io.axept.samplekotlin.MainActivity
 /**
  * Demonstrates the StateFlow-based [AxeptioStore] for reactive consent state in Jetpack Compose.
  *
- * Analogue of the iOS `SwiftUISampleView` that ships on `sample-app-ios` `release/2.2.0-beta.1`.
- * The screen registers an [AxeptioStore] as an event listener for the duration it is on-screen and
- * surfaces the flows it exposes — Google Consent Mode v2 map, popup-closed / consent-cleared
- * counters, and the SDK-level error channel added in 2.2.0-beta.1.
+ * Analogue of the iOS `SwiftUISampleView`. The screen registers an [AxeptioStore] as an event
+ * listener for the duration it is on-screen and surfaces the flows it exposes — Google Consent Mode
+ * v2 map, popup-closed / consent-cleared counters, and the SDK-level error channel added in 2.2.0.
+ *
+ * [AxeptioStore] does not (yet) expose a flow for `onCMPRestored`, the silent-restoration callback
+ * added in SDK 2.4.0, so that one is observed through a plain [AxeptioEventListener] registered
+ * alongside the store — which also shows that several listeners can be attached at once.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AxeptioStoreDemoScreen(onBackClick: () -> Unit) {
     val activity = LocalContext.current as MainActivity
     val store = remember { AxeptioStore() }
+    var cmpRestoredCount by remember { mutableIntStateOf(0) }
 
-    DisposableEffect(store) {
+    val restoreListener = remember {
+        object : AxeptioEventListener {
+            override fun onCMPRestored() {
+                cmpRestoredCount++
+            }
+        }
+    }
+
+    DisposableEffect(store, restoreListener) {
         AxeptioSDK.instance().setEventListener(store)
-        onDispose { AxeptioSDK.instance().removeEventListener(store) }
+        AxeptioSDK.instance().setEventListener(restoreListener)
+        onDispose {
+            AxeptioSDK.instance().removeEventListener(store)
+            AxeptioSDK.instance().removeEventListener(restoreListener)
+        }
     }
 
     val googleConsent by store.googleConsent.collectAsState()
@@ -92,6 +111,9 @@ fun AxeptioStoreDemoScreen(onBackClick: () -> Unit) {
                     Text("Event counters", style = MaterialTheme.typography.titleMedium)
                     Text("Popup closed: $popupClosedCount")
                     Text("Consent cleared: $consentClearedCount")
+                    // Fires once per silent restoration — on init, on foreground, and after network
+                    // recovery — so this climbs past 1 over a session without any popup being shown.
+                    Text("CMP restored (silent): $cmpRestoredCount")
                 }
             }
 

@@ -62,7 +62,15 @@ class MainActivity : ComponentActivity() {
 
         AxeptioSDK.instance().setForceShowConsentDebug(currentConfig.forceShowConsent)
 
+        // Controls whether the consent popup re-appears when the app returns to the foreground.
+        // Defaults to true in the SDK; set it to false to drive the popup timing yourself.
+        AxeptioSDK.instance()
+            .setDisplayPopUpOnEnterForeground(currentConfig.displayPopUpOnEnterForeground)
+
         AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
+            // Since SDK 2.3.0 the SDK forwards Google Consent Mode v2 signals to Firebase Analytics
+            // itself (codeless, via reflection), so this mapping is no longer required — it is kept
+            // here as the explicit reference implementation and to prove the callback fires.
             override fun onGoogleConsentModeUpdate(consentMap: Map<GoogleConsentType, GoogleConsentStatus>) {
                 val firebaseConsentMap = consentMap.entries.associate { (type, status) ->
                     val firebaseConsentType = when (type) {
@@ -80,6 +88,14 @@ class MainActivity : ComponentActivity() {
                     firebaseConsentType to firebaseConsentStatus
                 }
                 Firebase.analytics.setConsent(firebaseConsentMap)
+            }
+
+            // New in SDK 2.4.0. Fires once per silent restoration of existing, still-valid consent —
+            // i.e. no popup was shown. The SDK restores more than once per session (on initialize,
+            // on return to foreground, and after network recovery), so expect this repeatedly rather
+            // than only at startup. Consent is readable via getVendorConsents() by the time it fires.
+            override fun onCMPRestored() {
+                Log.d(TAG, "Consent silently restored — ${AxeptioSDK.instance().getConsentedVendors().size} vendors consented")
             }
 
             override fun onError(message: String) {

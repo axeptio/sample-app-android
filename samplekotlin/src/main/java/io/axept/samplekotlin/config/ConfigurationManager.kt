@@ -15,6 +15,7 @@ data class CustomerConfiguration(
     val consentExpirationDays: Int = 190,
     val shouldUpdateConsentExpiration: Boolean = false,
     val forceShowConsent: Boolean = false,
+    val displayPopUpOnEnterForeground: Boolean = true,
 ) {
     val displayName: String
         get() = "${if (targetService == AxeptioService.BRANDS) "Brands" else "TCF"}: $cookiesVersion"
@@ -52,6 +53,7 @@ class ConfigurationManager private constructor(private val context: Context) {
         const val CONSENT_EXPIRATION_DAYS = "axeptio.config.consentExpirationDays"
         const val SHOULD_UPDATE_CONSENT_EXPIRATION = "axeptio.config.shouldUpdateConsentExpiration"
         const val FORCE_SHOW_CONSENT = "axeptio.config.forceShowConsent"
+        const val DISPLAY_POPUP_ON_FOREGROUND = "axeptio.config.displayPopUpOnEnterForeground"
     }
 
     val presetConfigurations: Map<String, CustomerConfiguration> = mapOf(
@@ -98,6 +100,9 @@ class ConfigurationManager private constructor(private val context: Context) {
                 Keys.SHOULD_UPDATE_CONSENT_EXPIRATION, false
             )
             val forceShowConsent = sharedPrefs.getBoolean(Keys.FORCE_SHOW_CONSENT, false)
+            val displayPopUpOnEnterForeground = sharedPrefs.getBoolean(
+                Keys.DISPLAY_POPUP_ON_FOREGROUND, true
+            )
 
             return CustomerConfiguration(
                 clientId = clientId,
@@ -109,6 +114,7 @@ class ConfigurationManager private constructor(private val context: Context) {
                 consentExpirationDays = consentExpirationDays,
                 shouldUpdateConsentExpiration = shouldUpdateConsentExpiration,
                 forceShowConsent = forceShowConsent,
+                displayPopUpOnEnterForeground = displayPopUpOnEnterForeground,
             )
         }
         set(value) {
@@ -122,6 +128,7 @@ class ConfigurationManager private constructor(private val context: Context) {
                 .putInt(Keys.CONSENT_EXPIRATION_DAYS, value.consentExpirationDays)
                 .putBoolean(Keys.SHOULD_UPDATE_CONSENT_EXPIRATION, value.shouldUpdateConsentExpiration)
                 .putBoolean(Keys.FORCE_SHOW_CONSENT, value.forceShowConsent)
+                .putBoolean(Keys.DISPLAY_POPUP_ON_FOREGROUND, value.displayPopUpOnEnterForeground)
                 .putBoolean(Keys.HAS_CUSTOM_CONFIGURATION, true)
                 .apply()
         }
@@ -146,6 +153,7 @@ class ConfigurationManager private constructor(private val context: Context) {
             .remove(Keys.CONSENT_EXPIRATION_DAYS)
             .remove(Keys.SHOULD_UPDATE_CONSENT_EXPIRATION)
             .remove(Keys.FORCE_SHOW_CONSENT)
+            .remove(Keys.DISPLAY_POPUP_ON_FOREGROUND)
             .remove(Keys.HAS_CUSTOM_CONFIGURATION)
             .apply()
     }

@@ -156,7 +156,7 @@ fun MainScreen(
                         color = MaterialTheme.colorScheme.secondary
                     )
 
-                    // AxeptioStore (Compose) demo — new in 2.2.0-beta.1
+                    // AxeptioStore (Compose) demo — StateFlow-based reactive consent state
                     AxeptioButton(
                         label = "AxeptioStore Demo",
                         onClick = onNavigateToAxeptioStoreDemo,
