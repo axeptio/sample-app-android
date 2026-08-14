@@ -60,6 +60,8 @@ class DebugConsentInfoViewModel(application: Application) : AndroidViewModel(app
                     hasConsent = hasConsent,
                     consentString = tcfString,
                     lastUpdated = getCurrentTimestamp(),
+                    // SDK 2.2.0+: days until the stored consent expires; 0 when absent or expired.
+                    remainingDaysForConsent = axeptioSDK.getRemainingDaysForConsent(),
                     rawDebugInfo = debugInfo
                 )
             } catch (e: Exception) {
@@ -188,6 +190,7 @@ data class ConsentInfo(
     val hasConsent: Boolean,
     val consentString: String,
     val lastUpdated: String,
+    val remainingDaysForConsent: Int = 0,
     val error: String? = null,
     val rawDebugInfo: Map<String, Any?> = emptyMap()
 )

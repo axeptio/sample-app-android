@@ -58,7 +58,8 @@ fun MainScreen(
     onOpenWebView: (token: String) -> Unit,
     onNavigateToVendorTest: () -> Unit = {},
     onNavigateToConfiguration: () -> Unit = {},
-    onNavigateToDebugInfo: () -> Unit = {}
+    onNavigateToDebugInfo: () -> Unit = {},
+    onNavigateToAxeptioStoreDemo: () -> Unit = {}
 ) {
     val activity = LocalContext.current as MainActivity
     val context = LocalContext.current
@@ -153,6 +154,13 @@ fun MainScreen(
                         label = "Debug Consent Info",
                         onClick = onNavigateToDebugInfo,
                         color = MaterialTheme.colorScheme.secondary
+                    )
+
+                    // AxeptioStore (Compose) demo — StateFlow-based reactive consent state
+                    AxeptioButton(
+                        label = "AxeptioStore Demo",
+                        onClick = onNavigateToAxeptioStoreDemo,
+                        color = MaterialTheme.colorScheme.tertiary
                     )
 
                     AxeptioButton(

@@ -14,6 +14,8 @@ data class ConfigurationUiState(
     val customCookiesVersion: String = "",
     val customToken: String = "",
     val customTargetService: AxeptioService = AxeptioService.BRANDS,
+    val forceShowConsent: Boolean = false,
+    val displayPopUpOnEnterForeground: Boolean = true,
     val validationErrors: List<String> = emptyList()
 )
 
@@ -30,6 +32,8 @@ class ConfigurationViewModel : ViewModel() {
             customCookiesVersion = currentConfig.cookiesVersion,
             customToken = currentConfig.token ?: "",
             customTargetService = currentConfig.targetService,
+            forceShowConsent = currentConfig.forceShowConsent,
+            displayPopUpOnEnterForeground = currentConfig.displayPopUpOnEnterForeground,
             validationErrors = emptyList(),
             selectedPreset = findMatchingPreset(currentConfig, configManager)
         )
@@ -83,20 +87,48 @@ class ConfigurationViewModel : ViewModel() {
         )
     }
     
+    fun updateForceShowConsent(force: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            forceShowConsent = force,
+            selectedPreset = null,
+            validationErrors = emptyList()
+        )
+    }
+
+    fun updateDisplayPopUpOnEnterForeground(display: Boolean) {
+        _uiState.value = _uiState.value.copy(
+            displayPopUpOnEnterForeground = display,
+            selectedPreset = null,
+            validationErrors = emptyList()
+        )
+    }
+
     fun saveCustomConfiguration(configManager: ConfigurationManager) {
         val currentState = _uiState.value
-        
+        // Carry over the widget-testing fields this screen does not expose, so saving a custom
+        // configuration doesn't silently reset them to their defaults.
+        val existing = configManager.currentConfiguration
+
         val customConfig = CustomerConfiguration(
             clientId = currentState.customClientId,
             cookiesVersion = currentState.customCookiesVersion,
             token = if (currentState.customToken.isBlank()) null else currentState.customToken,
-            targetService = currentState.customTargetService
+            targetService = currentState.customTargetService,
+            widgetType = existing.widgetType,
+            prId = existing.prId,
+            consentExpirationDays = existing.consentExpirationDays,
+            shouldUpdateConsentExpiration = existing.shouldUpdateConsentExpiration,
+            forceShowConsent = currentState.forceShowConsent,
+            displayPopUpOnEnterForeground = currentState.displayPopUpOnEnterForeground,
         )
         
         val validationErrors = configManager.validateConfiguration(customConfig)
         
         if (validationErrors.isEmpty()) {
             configManager.currentConfiguration = customConfig
+            // The popup toggles are runtime setters, so apply them now rather than waiting for the
+            // next app start. clientId / cookiesVersion / targetService still need a restart.
+            configManager.applyPopupSettingsToSdk()
             _uiState.value = currentState.copy(
                 validationErrors = emptyList(),
                 selectedPreset = null // It's now a custom configuration

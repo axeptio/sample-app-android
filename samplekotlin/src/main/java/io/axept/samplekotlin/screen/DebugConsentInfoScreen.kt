@@ -180,6 +180,16 @@ fun DebugConsentInfoScreen(
                                     } else {
                                         DebugInfoItem("TCF String Status", "Empty/Not found")
                                     }
+
+                                    // getRemainingDaysForConsent() — 0 means no stored consent, or expired.
+                                    DebugInfoItem(
+                                        "Consent Expires In",
+                                        if (consentInfo.remainingDaysForConsent > 0) {
+                                            "${consentInfo.remainingDaysForConsent} days"
+                                        } else {
+                                            "No valid consent stored"
+                                        }
+                                    )
                                 }
 
                                 // Clear Consent Instructions

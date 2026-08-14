@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import io.axept.android.library.AxeptioService
+import io.axept.samplekotlin.screen.AxeptioStoreDemoScreen
 import io.axept.samplekotlin.screen.MainScreen
 import io.axept.samplekotlin.screen.WebViewScreen
 import io.axept.samplekotlin.screen.VendorConsentTestScreen
@@ -32,6 +33,9 @@ internal fun AppNavHost(navController: NavHostController, targetService: Axeptio
                 },
                 onNavigateToDebugInfo = {
                     navController.navigate(DebugConsentInfoDestination.route)
+                },
+                onNavigateToAxeptioStoreDemo = {
+                    navController.navigate(AxeptioStoreDemoDestination.route)
                 }
             )
         }
@@ -65,6 +69,12 @@ internal fun AppNavHost(navController: NavHostController, targetService: Axeptio
         composable(route = DebugConsentInfoDestination.route) {
             DebugConsentInfoScreen(
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(route = AxeptioStoreDemoDestination.route) {
+            AxeptioStoreDemoScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

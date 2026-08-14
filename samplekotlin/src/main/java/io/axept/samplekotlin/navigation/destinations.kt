@@ -24,6 +24,10 @@ object DebugConsentInfoDestination : Destination {
     override val route = "debug_consent_info_screen"
 }
 
+object AxeptioStoreDemoDestination : Destination {
+    override val route = "axeptio_store_demo_screen"
+}
+
 internal enum class ScreenArguments(val slug: String) {
     TOKEN("token")
 }
