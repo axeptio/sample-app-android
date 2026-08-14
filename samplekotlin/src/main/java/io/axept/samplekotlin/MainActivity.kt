@@ -60,12 +60,10 @@ class MainActivity : ComponentActivity() {
             shouldUpdateConsentExpiration = currentConfig.shouldUpdateConsentExpiration,
         )
 
-        AxeptioSDK.instance().setForceShowConsentDebug(currentConfig.forceShowConsent)
-
-        // Controls whether the consent popup re-appears when the app returns to the foreground.
-        // Defaults to true in the SDK; set it to false to drive the popup timing yourself.
-        AxeptioSDK.instance()
-            .setDisplayPopUpOnEnterForeground(currentConfig.displayPopUpOnEnterForeground)
+        // Applies setForceShowConsentDebug() and setDisplayPopUpOnEnterForeground() from the stored
+        // configuration. Both are runtime setters, so the Configuration screen re-applies them on
+        // every change rather than waiting for the next app start.
+        configManager.applyPopupSettingsToSdk()
 
         AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
             // Since SDK 2.3.0 the SDK forwards Google Consent Mode v2 signals to Firebase Analytics

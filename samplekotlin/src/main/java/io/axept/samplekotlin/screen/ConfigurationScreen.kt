@@ -82,9 +82,11 @@ fun ConfigurationScreen(
                     name = name,
                     config = config,
                     isSelected = uiState.selectedPreset == name,
-                    onSelect = { 
+                    onSelect = {
                         viewModel.selectPreset(name)
                         configManager.loadPresetConfiguration(name)
+                        configManager.applyPopupSettingsToSdk()
+                        viewModel.loadCurrentConfiguration(configManager)
                     }
                 )
             }

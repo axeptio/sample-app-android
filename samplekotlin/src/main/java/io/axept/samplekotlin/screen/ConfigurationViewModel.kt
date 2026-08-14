@@ -126,6 +126,9 @@ class ConfigurationViewModel : ViewModel() {
         
         if (validationErrors.isEmpty()) {
             configManager.currentConfiguration = customConfig
+            // The popup toggles are runtime setters, so apply them now rather than waiting for the
+            // next app start. clientId / cookiesVersion / targetService still need a restart.
+            configManager.applyPopupSettingsToSdk()
             _uiState.value = currentState.copy(
                 validationErrors = emptyList(),
                 selectedPreset = null // It's now a custom configuration

@@ -2,6 +2,7 @@ package io.axept.samplekotlin.config
 
 import android.content.Context
 import android.content.SharedPreferences
+import io.axept.android.library.AxeptioSDK
 import io.axept.android.library.AxeptioService
 import io.axept.android.library.WidgetType
 
@@ -34,8 +35,17 @@ class ConfigurationManager private constructor(private val context: Context) {
         }
 
         private const val DEFAULT_CLIENT_ID = "5fbfa806a0787d3985c6ee5f"
-        private const val DEFAULT_COOKIES_VERSION = "google cmp partner program sandbox-en-EU"
+
+        // Brands and Publishers/TCF are backed by different widget configurations; pairing a
+        // cookiesVersion with the wrong targetService loads a widget that does not exist, so the
+        // consent payload comes back empty. Keep these in step with the productFlavors in
+        // samplekotlin/build.gradle.kts.
+        private const val BRANDS_COOKIES_VERSION = "insideapp-brands"
+        private const val TCF_COOKIES_VERSION = "google cmp partner program sandbox-en-EU"
         private const val DEFAULT_CONSENT_EXPIRATION_DAYS = 190
+
+        private fun defaultCookiesVersionFor(service: AxeptioService): String =
+            if (service == AxeptioService.BRANDS) BRANDS_COOKIES_VERSION else TCF_COOKIES_VERSION
     }
 
     private val sharedPrefs: SharedPreferences = context.getSharedPreferences(
@@ -59,25 +69,25 @@ class ConfigurationManager private constructor(private val context: Context) {
     val presetConfigurations: Map<String, CustomerConfiguration> = mapOf(
         "Default Brands" to CustomerConfiguration(
             clientId = DEFAULT_CLIENT_ID,
-            cookiesVersion = DEFAULT_COOKIES_VERSION,
+            cookiesVersion = BRANDS_COOKIES_VERSION,
             token = "5sj42u50ta2ys8c3nhjkxi",
             targetService = AxeptioService.BRANDS
         ),
         "Default TCF" to CustomerConfiguration(
             clientId = DEFAULT_CLIENT_ID,
-            cookiesVersion = DEFAULT_COOKIES_VERSION,
+            cookiesVersion = TCF_COOKIES_VERSION,
             token = "5sj42u50ta2ys8c3nhjkxi",
             targetService = AxeptioService.PUBLISHERS_TCF
         ),
         "Test Brands (No Token)" to CustomerConfiguration(
             clientId = DEFAULT_CLIENT_ID,
-            cookiesVersion = DEFAULT_COOKIES_VERSION,
+            cookiesVersion = BRANDS_COOKIES_VERSION,
             token = null,
             targetService = AxeptioService.BRANDS
         ),
         "Test TCF (No Token)" to CustomerConfiguration(
             clientId = DEFAULT_CLIENT_ID,
-            cookiesVersion = DEFAULT_COOKIES_VERSION,
+            cookiesVersion = TCF_COOKIES_VERSION,
             token = null,
             targetService = AxeptioService.PUBLISHERS_TCF
         )
@@ -86,10 +96,12 @@ class ConfigurationManager private constructor(private val context: Context) {
     var currentConfiguration: CustomerConfiguration
         get() {
             val clientId = sharedPrefs.getString(Keys.CLIENT_ID, null) ?: DEFAULT_CLIENT_ID
-            val cookiesVersion = sharedPrefs.getString(Keys.COOKIES_VERSION, null) ?: DEFAULT_COOKIES_VERSION
             val token = sharedPrefs.getString(Keys.TOKEN, null)
             val serviceOrdinal = sharedPrefs.getInt(Keys.TARGET_SERVICE, AxeptioService.BRANDS.ordinal)
             val targetService = AxeptioService.values().getOrElse(serviceOrdinal) { AxeptioService.BRANDS }
+            // Resolved after targetService so an unconfigured app defaults to a matching pair.
+            val cookiesVersion = sharedPrefs.getString(Keys.COOKIES_VERSION, null)
+                ?: defaultCookiesVersionFor(targetService)
             val widgetTypeOrdinal = sharedPrefs.getInt(Keys.WIDGET_TYPE, WidgetType.PRODUCTION.ordinal)
             val widgetType = WidgetType.values().getOrElse(widgetTypeOrdinal) { WidgetType.PRODUCTION }
             val prId = sharedPrefs.getString(Keys.PR_ID, null)
@@ -182,6 +194,20 @@ class ConfigurationManager private constructor(private val context: Context) {
         }
 
         return errors
+    }
+
+    /**
+     * Pushes the popup-behaviour toggles of the current configuration into the SDK.
+     *
+     * Both are plain runtime setters, so they take effect immediately — unlike `clientId`,
+     * `cookiesVersion` and `targetService`, which are only read by `initialize()` and therefore
+     * need an app restart. Call this after any change to the stored configuration so the switches
+     * on the Configuration screen behave as live controls.
+     */
+    fun applyPopupSettingsToSdk() {
+        val config = currentConfiguration
+        AxeptioSDK.instance().setForceShowConsentDebug(config.forceShowConsent)
+        AxeptioSDK.instance().setDisplayPopUpOnEnterForeground(config.displayPopUpOnEnterForeground)
     }
 
     val currentServiceDisplayName: String
