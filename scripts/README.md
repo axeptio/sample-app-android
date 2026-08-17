@@ -123,6 +123,27 @@ This single command will:
 - **Emulator**: Pixel_9
 - **Package**: io.axept.samplekotlin
 
+## 🏷️ Release & versioning
+
+The sample app's version deliberately mirrors the Axeptio SDK version it targets, so the version is a
+human decision recorded in the repo — not something CI infers from commit history or from which tags
+happen to be reachable.
+
+**Bumping the version is how you release.** In the PR that points the app at a new SDK:
+
+```bash
+node scripts/update-version.js 2.5.0   # writes build.gradle.kts, package.json, package-lock.json
+```
+
+Commit those alongside the SDK dependency bump. On merge to `master` the `Release` job reads the
+declared version and, if no `v2.5.0` tag exists yet, generates the changelog and cuts the signed tag
+and GitHub Release. A merge that does *not* change the version releases nothing, so ordinary merges
+need no special handling — no `[skip ci]` required.
+
+`scripts/declared-version.sh` prints the declared version and fails if `build.gradle.kts` and
+`package.json` disagree. `PR Quality Checks` runs it, so a half-finished bump fails on the PR rather
+than at release time.
+
 ## 🔧 Troubleshooting
 
 ### Common Issues
@@ -198,5 +219,7 @@ With these scripts, you can efficiently test:
 | `emulator.sh` | Emulator control | Start/stop/status/list |
 | `install-app.sh` | App deployment | Install + optional launch |
 | `logcat.sh` | Log monitoring | Filtered, colorized output |
+| `update-version.js` | Set the declared version | Writes build.gradle.kts + package.json; bumping it releases |
+| `declared-version.sh` | Read/validate the version | Fails if the two declarations disagree; used by CI |
 
 All scripts include comprehensive error handling, status feedback, and help documentation.
