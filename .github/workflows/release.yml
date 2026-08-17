@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         # npm ci, not npm install: package-lock.json is tracked, so the toolchain
-        # (semantic-release, commitlint, husky) resolves to pinned versions instead of drifting.
+        # (commitlint, husky) resolves to pinned versions instead of drifting.
         run: npm ci
 
       - name: Setup Java
@@ -203,62 +203,61 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # The version the repo declares is the single source of truth, and a release happens only when
+      # a human has bumped it. Nothing here infers a version from commit history or tag reachability:
+      # the sample app's version deliberately mirrors the SDK version it targets, which no amount of
+      # commit analysis can know. An ordinary merge therefore releases nothing, so merge commits no
+      # longer need `[skip ci]` to stay safe (MSK-241).
+      #
+      # Bump both files together with `node scripts/update-version.js <version>` in the PR that
+      # targets a new SDK; PR Quality Checks fails a PR that bumps only one of them.
+      - name: Resolve declared version
+        id: declared
+        env:
+          GH_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          DECLARED=$(./scripts/declared-version.sh)
+          echo "version=$DECLARED" >> "$GITHUB_OUTPUT"
+
+          # matching-refs, not `git/ref/tags/...`: it answers "no such tag" with an empty 200 array
+          # rather than a 404, so a non-zero exit here means the query itself failed. Under `set -e`
+          # that fails the job — the safe direction. Swallowing the error and treating it as "no tag
+          # exists" would turn a transient API blip into an unwanted release.
+          MATCHES=$(gh api "repos/${{ github.repository }}/git/matching-refs/tags/v$DECLARED" --jq '.[].ref')
+
+          # Exact match: matching-refs is a prefix query, so v2.4 would otherwise match v2.4.0.
+          if printf '%s\n' "$MATCHES" | grep -qxF "refs/tags/v$DECLARED"; then
+            echo "v$DECLARED is already released - nothing to do."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "v$DECLARED is not released yet - releasing."
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Only a smoke check — nothing here is uploaded or attached to the release — and PR Quality
+      # Checks already ran assembleRelease on this code before it merged. Skipping it when there is
+      # nothing to release keeps an ordinary merge cheap; `test`, `lint` and assembleDebug still run
+      # on every master push in Quality Checks, which gates this job.
       - name: Build Android apps
+        if: steps.declared.outputs.changed == 'true'
         run: ./gradlew assembleRelease --stacktrace
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
 
-      - name: Get Next Version
-        id: get_version
-        uses: PaulHatch/semantic-version@v5.4.0
-        with:
-          tag_prefix: "v"
-          major_pattern: "(MAJOR)"
-          minor_pattern: "(MINOR)"
-          version_format: "${major}.${minor}.${patch}"
-          change_path: "."
-          namespace: ""
-          bump_each_commit: false
-          search_commit_body: false
-          user_format_type: "json"
-          enable_prerelease_mode: false
-
-      - name: Check and Clean Existing Tag
-        if: steps.get_version.outputs.changed == 'true'
+      - name: Authenticate git remote for pushes
+        if: steps.declared.outputs.changed == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         run: |
-          # Set up authentication for tag operations
+          # Checkout above uses persist-credentials: false, so the tag and branch pushes below need
+          # the token wired into the remote explicitly.
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
-          
-          # Check if tag exists locally
-          if git rev-parse "v${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
-            echo "Tag v${{ steps.get_version.outputs.version }} exists locally, deleting..."
-            git tag -d "v${{ steps.get_version.outputs.version }}"
-          fi
-          
-          # Check if tag exists remotely and delete it
-          if git ls-remote --tags origin | grep -q "refs/tags/v${{ steps.get_version.outputs.version }}"; then
-            echo "Tag v${{ steps.get_version.outputs.version }} exists remotely, deleting..."
-            git push origin ":refs/tags/v${{ steps.get_version.outputs.version }}"
-          fi
-
-      - name: Update versions using existing script
-        if: steps.get_version.outputs.changed == 'true'
-        run: |
-          # Update package.json version (no git operations)
-          npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
-          
-          # Update Android version in the Kotlin sample app
-          node scripts/update-version.js ${{ steps.get_version.outputs.version }}
-
-          # Commit all version updates in one signed commit
-          git add package.json package-lock.json samplekotlin/build.gradle.kts
-          git commit -S -m "chore(release): v${{ steps.get_version.outputs.version }} [skip ci]"
 
       - name: Generate Changelog
-        if: steps.get_version.outputs.changed == 'true'
+        if: steps.declared.outputs.changed == 'true'
         id: changelog
         uses: TriPSs/conventional-changelog-action@v5
         with:
@@ -269,12 +268,12 @@ jobs:
           skip-commit: true
           skip-tag: true
           git-push: false
-          version: ${{ steps.get_version.outputs.version }}
+          version: ${{ steps.declared.outputs.version }}
           tag-prefix: 'v'
           output-file: 'CHANGELOG.md'
 
       - name: Commit Changelog
-        if: steps.get_version.outputs.changed == 'true' && steps.changelog.outputs.skipped != 'true'
+        if: steps.declared.outputs.changed == 'true' && steps.changelog.outputs.skipped != 'true'
         run: |
           # Restore git config after changelog action changes it
           git config --global user.name "axeptio-release-bot"
@@ -282,10 +281,10 @@ jobs:
           git config --global commit.gpgsign true
           
           git add CHANGELOG.md
-          git commit -S -m "docs: update CHANGELOG.md for v${{ steps.get_version.outputs.version }} [skip ci]"
+          git commit -S -m "docs: update CHANGELOG.md for v${{ steps.declared.outputs.version }} [skip ci]"
 
       - name: Create and Push Tag
-        if: steps.get_version.outputs.changed == 'true'
+        if: steps.declared.outputs.changed == 'true'
         run: |
           # Debug: Show commits that will be pushed
           echo "=== Commits to be pushed ==="
@@ -300,19 +299,19 @@ jobs:
           git log origin/master..HEAD --show-signature
           
           # Create signed tag
-          git tag -s v${{ steps.get_version.outputs.version }} -m "Release v${{ steps.get_version.outputs.version }}"
+          git tag -s v${{ steps.declared.outputs.version }} -m "Release v${{ steps.declared.outputs.version }}"
           
-          # Push commits and tags (authentication already set up in Check and Clean Existing Tag step)
+          # Push commits and tags (authentication set up in the Authenticate git remote step)
           git push origin HEAD:master
-          git push origin v${{ steps.get_version.outputs.version }}
+          git push origin v${{ steps.declared.outputs.version }}
 
       - name: Create GitHub Release
-        if: steps.get_version.outputs.changed == 'true'
+        if: steps.declared.outputs.changed == 'true'
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.BOT_GITHUB_TOKEN }}
-          tag_name: v${{ steps.get_version.outputs.version }}
-          name: v${{ steps.get_version.outputs.version }}
+          tag_name: v${{ steps.declared.outputs.version }}
+          name: v${{ steps.declared.outputs.version }}
           body: ${{ steps.changelog.outputs.clean_changelog }}
           draft: false
           prerelease: false
@@ -348,7 +347,7 @@ jobs:
 
       - name: Install dependencies
         # npm ci, not npm install: package-lock.json is tracked, so the toolchain
-        # (semantic-release, commitlint, husky) resolves to pinned versions instead of drifting.
+        # (commitlint, husky) resolves to pinned versions instead of drifting.
         run: npm ci
 
       - name: Setup Java
@@ -372,6 +371,11 @@ jobs:
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+
+      # Fails a PR that bumps versionName without package.json (or the reverse). The release gate on
+      # master runs the same script, so catching it here means the mismatch never reaches a release.
+      - name: Validate declared version
+        run: ./scripts/declared-version.sh
 
       - name: Validate PR commits
         run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
