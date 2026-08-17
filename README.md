@@ -44,7 +44,7 @@ The `samplekotlin` module includes additional debugging and testing capabilities
 - **Configuration Management**: Dynamic switching between Brands and Publishers TCF services, plus the `setForceShowConsentDebug()` and `setDisplayPopUpOnEnterForeground()` toggles
 - **Debug Consent Info**: Detailed analysis of TCF consent data, vendor information, and the remaining days before consent expires
 - **Vendor Consent Testing**: Live testing interface for individual vendor consent validation
-- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback (see the warning under [Silent CMP Restoration](#silent-cmp-restoration) — that callback does not fire in SDK `2.4.0`)
+- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback (see the warning under [Silent CMP Restoration](#silent-cmp-restoration) — that callback does not fire on silent restoration in SDK `2.4.0`)
 - **Automation Scripts**: Complete build, deploy, and testing automation
 
 > **⚠️ Note**: The `ConfigurationManager` class is part of the sample application and is not included in the Axeptio SDK. It demonstrates how to implement dynamic configuration switching in your own applications.
@@ -562,9 +562,11 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 > silently restored, for either service, and on the Brands service it fires when the consent widget
 > **fails to load** — the opposite of what it means.
 >
-> The cause is not in your integration: the callback is triggered by an internal `app:cookies:ready`
-> event that the consent widget only emits on an error or when it is about to show the popup, never on
-> the successful silent-restore path. Tracked in MSK-243 and fixed for the next SDK release.
+> The cause is not in your integration: the callback is driven by an internal `app:cookies:ready`
+> event, and that event is synthesised by the bootstrap page the SDK loads into its WebView rather
+> than by the consent widget itself. The page sends it only on an error or when the popup is about to
+> open — never on the successful silent-restore path, where it sends a bare `cookies:close` instead.
+> Tracked in MSK-243 and fixed for the next SDK release.
 >
 > Until then, read consent state directly — `getVendorConsents()` and friends are populated once
 > restoration completes — or use `onGoogleConsentModeUpdate()`, which is delivered correctly during
