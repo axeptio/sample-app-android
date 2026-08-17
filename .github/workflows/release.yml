@@ -221,7 +221,14 @@ jobs:
           DECLARED=$(./scripts/declared-version.sh)
           echo "version=$DECLARED" >> "$GITHUB_OUTPUT"
 
-          if gh api "repos/${{ github.repository }}/git/ref/tags/v$DECLARED" >/dev/null 2>&1; then
+          # matching-refs, not `git/ref/tags/...`: it answers "no such tag" with an empty 200 array
+          # rather than a 404, so a non-zero exit here means the query itself failed. Under `set -e`
+          # that fails the job — the safe direction. Swallowing the error and treating it as "no tag
+          # exists" would turn a transient API blip into an unwanted release.
+          MATCHES=$(gh api "repos/${{ github.repository }}/git/matching-refs/tags/v$DECLARED" --jq '.[].ref')
+
+          # Exact match: matching-refs is a prefix query, so v2.4 would otherwise match v2.4.0.
+          if printf '%s\n' "$MATCHES" | grep -qxF "refs/tags/v$DECLARED"; then
             echo "v$DECLARED is already released - nothing to do."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
