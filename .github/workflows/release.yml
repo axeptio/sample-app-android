@@ -14,9 +14,12 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+      # The daemon's heap comes from gradle.properties; the worker count is Gradle's default
+      # (nothing sets org.gradle.workers.max). Do NOT reintroduce
+      # ORG_GRADLE_PROJECT_org.gradle.jvmargs / ORG_GRADLE_PROJECT_org.gradle.workers.max here:
+      # those define project properties, not build-environment settings, so Gradle ignores them
+      # for both settings. GRADLE_OPTS below configures the short-lived launcher JVM only.
+      GRADLE_OPTS: "-Dfile.encoding=UTF-8"
 
     permissions:
       contents: read
@@ -119,9 +122,12 @@ jobs:
     needs: quality-checks
 
     env:
-      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+      # The daemon's heap comes from gradle.properties; the worker count is Gradle's default
+      # (nothing sets org.gradle.workers.max). Do NOT reintroduce
+      # ORG_GRADLE_PROJECT_org.gradle.jvmargs / ORG_GRADLE_PROJECT_org.gradle.workers.max here:
+      # those define project properties, not build-environment settings, so Gradle ignores them
+      # for both settings. GRADLE_OPTS below configures the short-lived launcher JVM only.
+      GRADLE_OPTS: "-Dfile.encoding=UTF-8"
 
     permissions:
       contents: write
@@ -315,9 +321,12 @@ jobs:
     if: github.event_name == 'pull_request'
 
     env:
-      GRADLE_OPTS: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.jvmargs: "-Xmx6g -XX:+UseParallelGC -Dfile.encoding=UTF-8"
-      ORG_GRADLE_PROJECT_org.gradle.workers.max: 2
+      # The daemon's heap comes from gradle.properties; the worker count is Gradle's default
+      # (nothing sets org.gradle.workers.max). Do NOT reintroduce
+      # ORG_GRADLE_PROJECT_org.gradle.jvmargs / ORG_GRADLE_PROJECT_org.gradle.workers.max here:
+      # those define project properties, not build-environment settings, so Gradle ignores them
+      # for both settings. GRADLE_OPTS below configures the short-lived launcher JVM only.
+      GRADLE_OPTS: "-Dfile.encoding=UTF-8"
 
     permissions:
       contents: read
