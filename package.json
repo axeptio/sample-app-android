@@ -22,7 +22,6 @@
     "semantic-release": "^22.0.12"
   },
   "scripts": {
-    "semantic-release": "semantic-release",
     "prepare": "husky install",
     "commitlint": "commitlint --edit"
   },
