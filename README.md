@@ -44,7 +44,7 @@ The `samplekotlin` module includes additional debugging and testing capabilities
 - **Configuration Management**: Dynamic switching between Brands and Publishers TCF services, plus the `setForceShowConsentDebug()` and `setDisplayPopUpOnEnterForeground()` toggles
 - **Debug Consent Info**: Detailed analysis of TCF consent data, vendor information, and the remaining days before consent expires
 - **Vendor Consent Testing**: Live testing interface for individual vendor consent validation
-- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback
+- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback (see the warning under [Silent CMP Restoration](#silent-cmp-restoration) — that callback does not fire in SDK `2.4.0`)
 - **Automation Scripts**: Complete build, deploy, and testing automation
 
 > **⚠️ Note**: The `ConfigurationManager` class is part of the sample application and is not included in the Axeptio SDK. It demonstrates how to implement dynamic configuration switching in your own applications.
@@ -384,8 +384,9 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
     }
 
     override fun onCMPRestored() {
-        // Existing, still-valid consent was restored without showing a popup (SDK 2.4.0+).
-        // See "Silent CMP Restoration".
+        // Intended to fire when existing, still-valid consent was restored without showing a
+        // popup (SDK 2.4.0+). Not usable in 2.4.0 — see "Silent CMP Restoration" before relying
+        // on it.
     }
 
     override fun onConsentCleared() {
@@ -546,7 +547,7 @@ Accept or refuse consent in the Axeptio popup and look for `Setting consent, pac
 ## Silent CMP Restoration
 *Introduced in SDK `2.4.0`.*
 
-`onCMPRestored()` fires when the SDK silently restores existing, still-valid consent — that is, consent was already stored and **no popup was shown**.
+`onCMPRestored()` is intended to fire when the SDK silently restores existing, still-valid consent — that is, consent was already stored and **no popup was shown**.
 
 ```kotlin
 AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
@@ -556,13 +557,26 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 })
 ```
 
-Behaviour worth knowing before you rely on it:
+> [!WARNING]
+> **Do not rely on this callback in SDK `2.4.0`.** As shipped it does **not** fire when consent is
+> silently restored, for either service, and on the Brands service it fires when the consent widget
+> **fails to load** — the opposite of what it means.
+>
+> The cause is not in your integration: the callback is triggered by an internal `app:cookies:ready`
+> event that the consent widget only emits on an error or when it is about to show the popup, never on
+> the successful silent-restore path. Tracked in MSK-243 and fixed for the next SDK release.
+>
+> Until then, read consent state directly — `getVendorConsents()` and friends are populated once
+> restoration completes — or use `onGoogleConsentModeUpdate()`, which is delivered correctly during
+> silent restoration.
+
+Intended behaviour, once the fix ships:
 
 - It fires **once per restoration**, and the SDK restores **more than once per session** — on `initialize()`, when the app returns to the foreground, and after network connectivity is restored. Expect it repeatedly over an app's lifetime, not just at startup. Make your handler idempotent.
 - When restoration succeeds, the consent is readable via `getVendorConsents()` by the time the callback fires, and the matching Google Consent Mode signals are delivered through `onGoogleConsentModeUpdate()` during the same restoration.
 - It is **not** called when the consent popup is displayed — use `onPopupClosedEvent()` for that case — nor after `clearConsents()` invalidates an in-flight restoration.
 
-See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter. Note that `AxeptioStore` does not currently expose a `StateFlow` for this callback, so the sample observes it with a plain `AxeptioEventListener` registered alongside the store — several listeners can be attached at once.
+See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter — which is why that counter stays at zero on `2.4.0`. Note that `AxeptioStore` does not expose a `StateFlow` for this callback in `2.4.0`, so the sample observes it with a plain `AxeptioEventListener` registered alongside the store — several listeners can be attached at once. A `cmpRestoredEventCount` flow arrives with the fix (MSK-242).
 
 <br><br><br>
 
