@@ -7,6 +7,14 @@ plugins {
     // id("org.owasp.dependencycheck")
 }
 
+// The Axeptio SDK release this sample targets — single source of truth for the dependency
+// coordinate and the AXEPTIO_SDK_VERSION BuildConfig field of both flavors.
+//
+// `versionName` below deliberately mirrors it, but stays a literal: scripts/update-version.js
+// rewrites it by regex and scripts/declared-version.sh parses it with awk, and neither can see
+// through a variable. declared-version.sh compares the two and fails the build if they drift.
+val axeptioSdkVersion = "2.5.0"
+
 android {
     namespace = "io.axept.samplekotlin"
     compileSdk = 35
@@ -44,14 +52,14 @@ android {
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
-                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.5.0\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"$axeptioSdkVersion\"")
             }
             create("brands") {
                 dimension = "service"
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
-                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.5.0\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"$axeptioSdkVersion\"")
             }
         }
     }
@@ -79,7 +87,7 @@ dependencies {
         implementation(project(":android"))
     } else {
         // CI/CD or production builds - use published SDK
-        implementation("io.axept.android:android-sdk:2.5.0")
+        implementation("io.axept.android:android-sdk:$axeptioSdkVersion")
     }
 
 
