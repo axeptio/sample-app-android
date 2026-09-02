@@ -623,10 +623,11 @@ Both toggles are wired to switches on the sample's **Configuration** screen.
 The Axeptio SDK provides comprehensive APIs for managing vendor consent in TCF (Transparency and Consent Framework) mode. These APIs are **exclusively available for Publishers using the TCF service** and allow you to query individual vendor consent states, implement vendor-specific functionality, and maintain compliance with IAB TCF requirements.
 
 > [!IMPORTANT]
-> Since SDK `2.5.0` the consent getters — `getVendorConsents()`, `getConsentedVendors()`,
-> `getRefusedVendors()`, `getConsentDebugInfo()` and `showConsentScreen()` — throw
-> `IllegalStateException` when called before `initialize()`, instead of returning empty results.
-> Wrap the calls in `try`/`catch`, as every example below does, and treat a failure as "no consent".
+> Since SDK `2.5.0`, calling the consent APIs before `initialize()` throws `IllegalStateException`.
+> The getters — `getVendorConsents()`, `getConsentedVendors()`, `getRefusedVendors()` and
+> `getConsentDebugInfo()` — throw instead of returning empty results, and `showConsentScreen()`
+> throws instead of silently doing nothing. Wrap the calls in `try`/`catch`, as every example below
+> does, and treat a failure as "no consent".
 
 #### When to Use TCF Vendor APIs
 Use these APIs when your app needs to:
