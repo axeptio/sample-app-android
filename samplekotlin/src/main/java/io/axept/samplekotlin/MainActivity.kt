@@ -88,12 +88,21 @@ class MainActivity : ComponentActivity() {
                 Firebase.analytics.setConsent(firebaseConsentMap)
             }
 
-            // New in SDK 2.4.0. Fires once per silent restoration of existing, still-valid consent —
+            // Added in SDK 2.4.0, fixed in 2.5.0 — earlier releases never fired it on the successful
+            // restore path. Fires once per silent restoration of existing, still-valid consent —
             // i.e. no popup was shown. The SDK restores more than once per session (on initialize,
             // on return to foreground, and after network recovery), so expect this repeatedly rather
             // than only at startup. Consent is readable via getVendorConsents() by the time it fires.
             override fun onCMPRestored() {
                 Log.d(TAG, "Consent silently restored — ${AxeptioSDK.instance().getConsentedVendors().size} vendors consented")
+            }
+
+            // New in SDK 2.5.0. The counterpart to onCMPRestored(): fires once per consent decision
+            // the user saves in the popup — accept, refuse or customise — after the decision has been
+            // persisted, so getVendorConsents() already reflects it here. Never fires for a silent
+            // restoration, and is not replayed to listeners registered after the decision was made.
+            override fun onConsentSaved() {
+                Log.d(TAG, "Consent saved by the user — ${AxeptioSDK.instance().getConsentedVendors().size} vendors consented")
             }
 
             override fun onError(message: String) {
