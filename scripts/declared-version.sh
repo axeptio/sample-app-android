@@ -36,7 +36,7 @@ fi
 # The SDK coordinate and the AXEPTIO_SDK_VERSION BuildConfig fields all read `axeptioSdkVersion`,
 # which update-version.js does not touch. The app version mirrors the SDK version it targets, so
 # catch the drift here rather than shipping a build whose header reports the wrong SDK.
-sdk=$(awk -F'"' '/^val axeptioSdkVersion = /{ print $2; exit }' "$gradle_file")
+sdk=$(awk -F'"' '/^[[:space:]]*val[[:space:]]+axeptioSdkVersion[[:space:]]*=/{ print $2; exit }' "$gradle_file")
 if [ -z "$sdk" ]; then
     echo "::error file=samplekotlin/build.gradle.kts::could not parse axeptioSdkVersion" >&2
     exit 1
