@@ -1,12 +1,12 @@
 {
   "name": "axeptio-android-sample-app",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "Axeptio Android SDK Sample Applications",
   "repository": {
     "type": "git",
     "url": "https://github.com/axeptio/sample-app-android.git"
   },
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN README.md",
   "private": true,
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",

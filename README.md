@@ -2,9 +2,9 @@
 
 # Axeptio Android SDK Documentation
 
-> **Aligned with Axeptio Android SDK `2.4.0`.** This repository ships a single module — `samplekotlin` (Kotlin + Jetpack Compose). The `samplejava/` module was removed when the SDK dropped Java language support in `2.2.0`; see [Migrating from Java](#migrating-from-java).
+> **Aligned with Axeptio Android SDK `2.5.0`.** This repository ships a single module — `samplekotlin` (Kotlin + Jetpack Compose). The `samplejava/` module was removed when the SDK dropped Java language support in `2.2.0`; see [Migrating from Java](#migrating-from-java).
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/master/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
+[![License](https://img.shields.io/badge/license-Axeptio%20Terms-blue.svg)](https://www.axept.io/fr/?axeptio_contract=terms_of_use_en) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/master/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
  
 
 
@@ -32,19 +32,20 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 17. [Consent Expiry and Popup Control](#consent-expiry-and-popup-control)
 18. [TCF Vendor Management APIs](#tcf-vendor-management-apis)
 19. [Migrating from Java](#migrating-from-java)
+20. [License](#license)
 
 
 <br><br>
 
 ## Overview
-The repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.4.0` with Kotlin and Jetpack Compose. It can be built using either the **brands** or **publishers** variants.
+The repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.5.0` with Kotlin and Jetpack Compose. It can be built using either the **brands** or **publishers** variants.
 
 ### Sample App Features
 The `samplekotlin` module includes additional debugging and testing capabilities:
 - **Configuration Management**: Dynamic switching between Brands and Publishers TCF services, plus the `setForceShowConsentDebug()` and `setDisplayPopUpOnEnterForeground()` toggles
 - **Debug Consent Info**: Detailed analysis of TCF consent data, vendor information, and the remaining days before consent expires
 - **Vendor Consent Testing**: Live testing interface for individual vendor consent validation
-- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose, including the SDK error channel and the `onCMPRestored()` silent-restoration callback (see the warning under [Silent CMP Restoration](#silent-cmp-restoration) — that callback does not fire on silent restoration in SDK `2.4.0`)
+- **AxeptioStore Demo**: Reactive `StateFlow` consent state in Compose — the SDK error channel plus live `cmpRestoredEventCount` and `consentSavedEventCount` counters, both new in SDK `2.5.0`
 - **Automation Scripts**: Complete build, deploy, and testing automation
 
 > **⚠️ Note**: The `ConfigurationManager` class is part of the sample application and is not included in the Axeptio SDK. It demonstrates how to implement dynamic configuration switching in your own applications.
@@ -142,7 +143,7 @@ To test SDK changes using a cookie configuration from the production backoffice,
 
 To test the version currently in production, instead checkout the `sample-app-android repository`, configure the widget, and in `build.gradle.kts` set the desired SDK version, for example: 
 ```gradle
-implementation("io.axept.android:android-sdk:2.4.0")
+implementation("io.axept.android:android-sdk:2.5.0")
 ```
 To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
 ```kotlin
@@ -250,13 +251,13 @@ After adding the repository, include the Axeptio SDK as a dependency in your pro
  - **Kotlin DSL**
 ```kotlin
 dependencies {  
-    implementation("io.axept.android:android-sdk:2.4.0")
+    implementation("io.axept.android:android-sdk:2.5.0")
 }
 ```
  - **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.4.0'
+    implementation 'io.axept.android:android-sdk:2.5.0'
 }
 ```
 For more detailed instructions, refer to the [GitHub Documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package)
@@ -384,9 +385,12 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
     }
 
     override fun onCMPRestored() {
-        // Intended to fire when existing, still-valid consent was restored without showing a
-        // popup (SDK 2.4.0+). Not usable in 2.4.0 — see "Silent CMP Restoration" before relying
-        // on it.
+        // Existing, still-valid consent was restored without showing a popup.
+        // Added in SDK 2.4.0, fixed in 2.5.0 — see "Silent CMP Restoration".
+    }
+
+    override fun onConsentSaved() {
+        // The user saved a consent decision in the popup (SDK 2.5.0+).
     }
 
     override fun onConsentCleared() {
@@ -399,7 +403,20 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 })
 ```
 
-Use `removeEventListener(listener)` to unregister. More than one listener can be attached at a time — the sample's `AxeptioStore` demo relies on that.
+Use `removeEventListener(listener)` to unregister. More than one listener can be attached at a time — the sample registers one in `MainActivity` and another in `MainScreen`.
+
+##### `onConsentSaved()` vs `onCMPRestored()`
+*`onConsentSaved()` is new in SDK `2.5.0`.*
+
+The two callbacks cover the two ways consent arrives, and exactly one of them fires per event:
+
+| | `onConsentSaved()` | `onCMPRestored()` |
+|---|---|---|
+| Fires when | the user saves a decision in the popup — accept, refuse or customise | still-valid stored consent is restored with **no** popup |
+| How often | once per decision; the user can decide again later by reopening preferences | once per restoration, and the SDK restores repeatedly — on `initialize()`, on return to foreground, and after network recovery |
+| Replayed to late listeners | no | no |
+
+Both are delivered on the main thread, and in both cases `getVendorConsents()` / `getConsentedVendors()` already reflect the consent by the time the callback runs. `onConsentSaved()` still fires if the read-back afterwards fails or comes back empty — the decision itself happened. Make both handlers idempotent.
 
 ##### Reactive consumption with `AxeptioStore` (Compose)
 `AxeptioStore` implements `AxeptioEventListener` and re-exposes the events as `StateFlow`s for Jetpack Compose. It does not register itself, which keeps the lifecycle explicit:
@@ -413,9 +430,10 @@ DisposableEffect(store) {
 }
 
 val googleConsent by store.googleConsent.collectAsState()
+val consentSavedCount by store.consentSavedEventCount.collectAsState()
 val error by store.error.collectAsState()
 ```
-It exposes `googleConsent`, `popupClosedEventCount`, `consentClearedEventCount`, `error` and `clearError()`. See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt).
+It exposes `googleConsent`, `popupClosedEventCount`, `consentClearedEventCount`, `cmpRestoredEventCount`, `consentSavedEventCount`, `error` and `clearError()`. As of `2.5.0` there is a flow for every `AxeptioEventListener` callback, so consumers of the store never need to register a second, plain listener alongside it. The counters are cumulative `Int`s rather than flags, because each of these events can occur several times in a session. See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt).
 <br><br><br>
 ## Event source for KPI tracking
 To ensure proper KPI attribution in the back office, the App SDK now adds a specific `event_source` value when emitting TCF events from the WebView.
@@ -545,9 +563,9 @@ Accept or refuse consent in the Axeptio popup and look for `Setting consent, pac
 <br><br><br>
 
 ## Silent CMP Restoration
-*Introduced in SDK `2.4.0`.*
+*Introduced in SDK `2.4.0`; usable from `2.5.0`.*
 
-`onCMPRestored()` is intended to fire when the SDK silently restores existing, still-valid consent — that is, consent was already stored and **no popup was shown**.
+`onCMPRestored()` fires when the SDK silently restores existing, still-valid consent — that is, consent was already stored and **no popup was shown**.
 
 ```kotlin
 AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
@@ -557,28 +575,19 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 })
 ```
 
-> [!WARNING]
-> **Do not rely on this callback in SDK `2.4.0`.** As shipped it does **not** fire when consent is
-> silently restored, for either service, and on the Brands service it fires when the consent widget
-> **fails to load** — the opposite of what it means.
->
-> The cause is not in your integration: the callback is driven by an internal `app:cookies:ready`
-> event, and that event is synthesised by the bootstrap page the SDK loads into its WebView rather
-> than by the consent widget itself. The page sends it only on an error or when the popup is about to
-> open — never on the successful silent-restore path, where it sends a bare `cookies:close` instead.
-> Tracked in MSK-243 and fixed for the next SDK release.
->
-> Until then, read consent state directly — `getVendorConsents()` and friends are populated once
-> restoration completes — or use `onGoogleConsentModeUpdate()`, which is delivered correctly during
-> silent restoration.
-
-Intended behaviour, once the fix ships:
-
 - It fires **once per restoration**, and the SDK restores **more than once per session** — on `initialize()`, when the app returns to the foreground, and after network connectivity is restored. Expect it repeatedly over an app's lifetime, not just at startup. Make your handler idempotent.
-- When restoration succeeds, the consent is readable via `getVendorConsents()` by the time the callback fires, and the matching Google Consent Mode signals are delivered through `onGoogleConsentModeUpdate()` during the same restoration.
-- It is **not** called when the consent popup is displayed — use `onPopupClosedEvent()` for that case — nor after `clearConsents()` invalidates an in-flight restoration.
+- The consent is readable via `getVendorConsents()` by the time the callback fires, and the matching Google Consent Mode signals are delivered through `onGoogleConsentModeUpdate()` during the same restoration.
+- It is **not** called when the consent popup is displayed — use `onConsentSaved()` or `onPopupClosedEvent()` for that case — nor after `clearConsents()` invalidates an in-flight restoration.
 
-See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter — which is why that counter stays at zero on `2.4.0`. Note that `AxeptioStore` does not expose a `StateFlow` for this callback in `2.4.0`, so the sample observes it with a plain `AxeptioEventListener` registered alongside the store — several listeners can be attached at once. A `cmpRestoredEventCount` flow arrives with the fix (MSK-242).
+> [!IMPORTANT]
+> **On SDK `2.4.0` this callback was unusable and you should upgrade.** As shipped in `2.4.0` it did
+> not fire on successful silent restoration for either service, and on the Brands service it fired
+> when the consent widget **failed to load** — the opposite of what it means. Both are fixed in
+> `2.5.0`. If you are pinned to `2.4.0`, read consent state directly (`getVendorConsents()` and
+> friends are populated once restoration completes) or use `onGoogleConsentModeUpdate()`, which is
+> delivered correctly during silent restoration on both versions.
+
+See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter. From `2.5.0`, `AxeptioStore` exposes a `cmpRestoredEventCount` flow, so the sample observes it through the store alone — no second listener needed.
 
 <br><br><br>
 
@@ -589,7 +598,7 @@ See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotl
 val daysLeft = AxeptioSDK.instance().getRemainingDaysForConsent()
 // 0 when no consent is stored, or when it has already expired.
 ```
-The expiry window itself is set at initialization via `consentExpirationDays` (default `190`), with `shouldUpdateConsentExpiration` controlling whether an existing consent adopts a changed value.
+Since SDK `2.5.0` a partial day rounds **up**: consent expiring in less than 24 hours reports `1`, not `0`, so `0` unambiguously means "no valid consent". The expiry window itself is set at initialization via `consentExpirationDays` (default `190`), with `shouldUpdateConsentExpiration` controlling whether an existing consent adopts a changed value.
 
 ##### Force the popup during development
 ```kotlin
@@ -613,6 +622,13 @@ Both toggles are wired to switches on the sample's **Configuration** screen.
 
 ## TCF Vendor Management APIs
 The Axeptio SDK provides comprehensive APIs for managing vendor consent in TCF (Transparency and Consent Framework) mode. These APIs are **exclusively available for Publishers using the TCF service** and allow you to query individual vendor consent states, implement vendor-specific functionality, and maintain compliance with IAB TCF requirements.
+
+> [!IMPORTANT]
+> Since SDK `2.5.0`, calling the consent APIs before `initialize()` throws `IllegalStateException`.
+> The getters — `getVendorConsents()`, `getConsentedVendors()`, `getRefusedVendors()` and
+> `getConsentDebugInfo()` — throw instead of returning empty results, and `showConsentScreen()`
+> throws instead of silently doing nothing. Wrap the calls in `try`/`catch`, as every example below
+> does, and treat a failure as "no consent".
 
 #### When to Use TCF Vendor APIs
 Use these APIs when your app needs to:
@@ -765,3 +781,10 @@ Your options:
    ```
    Note that Kotlin default arguments are not available from Java, so every parameter of `initialize(...)` must be passed explicitly.
 3. **Stay on SDK `2.1.x`**, which retains Java support. Note that it does not receive the fixes and features described in this document.
+
+<br><br><br>
+
+## License
+The **Axeptio Android SDK** this sample integrates is distributed under [Axeptio's licensing terms](https://www.axept.io/fr/?axeptio_contract=terms_of_use_en), which have applied since SDK `1.2.0` — not an open-source license. Using the SDK requires a valid Axeptio license. Releases published before `1.2.0` remain under Apache 2.0.
+
+The sample code in this repository is provided as integration reference material.
