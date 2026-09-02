@@ -32,6 +32,7 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 17. [Consent Expiry and Popup Control](#consent-expiry-and-popup-control)
 18. [TCF Vendor Management APIs](#tcf-vendor-management-apis)
 19. [Migrating from Java](#migrating-from-java)
+20. [License](#license)
 
 
 <br><br>
@@ -780,3 +781,10 @@ Your options:
    ```
    Note that Kotlin default arguments are not available from Java, so every parameter of `initialize(...)` must be passed explicitly.
 3. **Stay on SDK `2.1.x`**, which retains Java support. Note that it does not receive the fixes and features described in this document.
+
+<br><br><br>
+
+## License
+The **Axeptio Android SDK** this sample integrates is distributed under [Axeptio's licensing terms](https://www.axept.io/fr/?axeptio_contract=terms_of_use_en), which have applied since SDK `1.2.0` — not an open-source license. Using the SDK requires a valid Axeptio license. Releases published before `1.2.0` remain under Apache 2.0.
+
+The sample code in this repository is provided as integration reference material.
