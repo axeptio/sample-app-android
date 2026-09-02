@@ -16,8 +16,8 @@ android {
         minSdk = 26
         targetSdk = 35
 
-        versionCode = 20400
-        versionName = "2.4.0"
+        versionCode = 20500
+        versionName = "2.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -44,14 +44,14 @@ android {
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"google cmp partner program sandbox-en-EU\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"publishers\"")
-                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.4.0\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.5.0\"")
             }
             create("brands") {
                 dimension = "service"
                 buildConfigField("String", "AXEPTIO_CLIENT_ID", "\"5fbfa806a0787d3985c6ee5f\"")
                 buildConfigField("String", "AXEPTIO_COOKIES_VERSION", "\"insideapp-brands\"")
                 buildConfigField("String", "AXEPTIO_TARGET_SERVICE", "\"brands\"")
-                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.4.0\"")
+                buildConfigField("String", "AXEPTIO_SDK_VERSION", "\"2.5.0\"")
             }
         }
     }
@@ -79,7 +79,7 @@ dependencies {
         implementation(project(":android"))
     } else {
         // CI/CD or production builds - use published SDK
-        implementation("io.axept.android:android-sdk:2.4.0")
+        implementation("io.axept.android:android-sdk:2.5.0")
     }
 
 
