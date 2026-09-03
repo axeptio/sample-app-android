@@ -86,7 +86,8 @@ vendor APIs) and some bugs have been brands-only, so **check both** when verifyi
 
 ## Branch & PR flow
 
-- Branch from `master`, open a PR. Branch names follow the Linear ticket: `msk-258-<slug>`.
+- Branch from `master`, open a PR. Branch names come from the Linear ticket's `gitBranchName`
+  field — `msk-<ticket>-<slug>`, e.g. `msk-258-app-sdk-android-update-public-sample-app-to-sdk-250`.
 - **Conventional commits are enforced** by commitlint via a husky `commit-msg` hook, with a
   restricted scope list in `.commitlintrc.json` (`sdk`, `build`, `kotlin`, `config`, `ui`, `docs`, …).
   A subject like "Address Copilot review round 1" is rejected — write a real conventional subject.
