@@ -41,9 +41,10 @@ Gradle variable. Do not "tidy" it into the constant — you will silently break 
 
 **A local SDK checkout silently replaces the published artifact.** `settings.gradle.kts` includes
 `../axeptio-android-sdk-sources/android` as module `:android` *if that directory exists*, and
-`build.gradle.kts` then prefers `project(":android")` over the published coordinate. On a machine
-with that checkout, a local build does **not** exercise the SDK version you just pinned. To verify
-against the real artifact, move the directory aside and confirm what resolved:
+`samplekotlin/build.gradle.kts` then prefers `project(":android")` over the published coordinate
+(the root `build.gradle.kts` has no such logic — don't go looking there). On a machine with that
+checkout, a local build does **not** exercise the SDK version you just pinned. To verify against
+the real artifact, move the directory aside and confirm what resolved:
 
 ```bash
 mv ../axeptio-android-sdk-sources ../axeptio-android-sdk-sources.off
