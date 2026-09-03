@@ -1,54 +1,63 @@
-# 2.4.0 (2026-08-10)
+# [2.5.0](https://github.com/axeptio/sample-app-android/compare/v2.4.0...v2.5.0) (2026-09-03)
 
-Aligns the public sample app with Axeptio Android SDK `2.4.0`, consolidating the `2.2.0`, `2.3.0` and `2.4.0` SDK releases. Supersedes the `release/2.2.0-beta.1` branch, which is now retired.
-
-### ⚠ BREAKING CHANGES
-
-* **sample-java:** the Java sample module has been removed. The SDK dropped Java language support in `2.2.0` (MSK-160) and removed the `@JvmStatic` companions; Java consumers must recompile and either migrate to Kotlin or call `AxeptioSDK.INSTANCE.instance()`. See the "Migrating from Java" section of the README.
-
-### Features
-
-* **sdk:** bump `io.axept.android:android-sdk` to `2.4.0`.
-* **sample-kotlin:** register the `onCMPRestored()` listener callback (new in SDK `2.4.0`) in `MainActivity` and surface a live counter on the `AxeptioStore` demo screen.
-* **sample-kotlin:** wire `setDisplayPopUpOnEnterForeground()` and expose it, alongside `setForceShowConsentDebug()`, as switches on the Configuration screen.
-* **sample-kotlin:** show `getRemainingDaysForConsent()` on the Debug Consent Info screen.
-* **sample-kotlin:** pass the full `initialize(...)` signature including `widgetType`, `prId`, `consentExpirationDays` and `shouldUpdateConsentExpiration`.
-* **sample-kotlin:** add `AxeptioStoreDemoScreen` showcasing the StateFlow-based `AxeptioStore` in Jetpack Compose, reachable from the main screen.
-* **sample-kotlin:** report the real SDK version in the app header instead of "Local Development Build".
 
 ### Bug Fixes
 
-* **gradle:** point the GitHub Packages Maven repository at `axeptio/axeptio-android-sdk` instead of the stale `axeptio/tcf-android-sdk` URL.
-* **sample-kotlin:** stop `saveCustomConfiguration()` silently resetting `widgetType`, `prId` and the consent-expiration fields, which the Configuration screen does not expose.
+* add explicit permissions to workflow jobs ([6121c90](https://github.com/axeptio/sample-app-android/commit/6121c901b156584f683155ffd0b45dd537f3e00d))
+* address actionlint issues in release workflow ([0f4c147](https://github.com/axeptio/sample-app-android/commit/0f4c147c9f20576f01674b6aabc46bd0ac80be02))
+* **build:** tolerate whitespace when parsing axeptioSdkVersion ([0a5788b](https://github.com/axeptio/sample-app-android/commit/0a5788b34246ba659b9853b853583f39043ee30a))
+* **build:** track package-lock.json so the release job can run ([770b432](https://github.com/axeptio/sample-app-android/commit/770b432554b9080d13b2a8a2d6c904def587707a))
+* **config:** pair cookiesVersion with targetService and apply popup toggles live ([7f738a2](https://github.com/axeptio/sample-app-android/commit/7f738a2004c2934b8af5842d4417bed75e46a356)), closes [#43](https://github.com/axeptio/sample-app-android/issues/43)
+* **release:** drive releases from the declared version, not tag reachability ([535690c](https://github.com/axeptio/sample-app-android/commit/535690cf63205938061487a848909fa410e14615)), closes [#45](https://github.com/axeptio/sample-app-android/issues/45)
+* **release:** fail the release gate on a tag-query error instead of releasing ([c3f25d5](https://github.com/axeptio/sample-app-android/commit/c3f25d58834b9b3152888ea9c4c46120ecee8235))
+* replace semantic-release with GPG-signed manual release workflow ([5229552](https://github.com/axeptio/sample-app-android/commit/522955275720d9c2218b3b6346a38491a0986b87))
+* resolve CI build failure due to invalid versionCode = NaN ([ba5f490](https://github.com/axeptio/sample-app-android/commit/ba5f4904d580ad5534d0a49ca64c62317fbfb6f9))
+* tcf fields api alignment ([8396418](https://github.com/axeptio/sample-app-android/commit/8396418a64063674df93f71200296085fd6f89f9))
 
-### Documentation
 
-* **readme:** document codeless consent forwarding to Firebase, AppsFlyer, Adjust and Singular (SDK `2.3.0`) — including that it needs no integration code and is a no-op for absent partners.
-* **readme:** document `onCMPRestored()` and its repeat-fire semantics, `getRemainingDaysForConsent()`, `setForceShowConsentDebug()`, `setDisplayPopUpOnEnterForeground()`, and the deprecated `clearConsent()` alias.
-* **readme:** document the full `initialize(...)` signature and that `targetService` is fixed for the process lifetime.
-* **readme:** rewrite the Google Consent v2 section to lead with automatic Firebase forwarding, keeping the manual mapping as the optional explicit path.
-* **readme:** remove the Java code samples, which no longer compile against the SDK, and replace them with a migration section.
+* feat!: align sample app with Axeptio Android SDK 2.4.0 ([ee90040](https://github.com/axeptio/sample-app-android/commit/ee900405dba2305f284952390d68225ad10df12d))
+* feat!: align sample app with Axeptio Android SDK 2.2.0-beta.1 ([472ed53](https://github.com/axeptio/sample-app-android/commit/472ed534d584b8ca9c3dec2cb99fba2743b974aa))
 
----
-
-# 2.2.0-beta.1 (2026-04-10)
-
-Beta release aligning the public sample app with Axeptio Android SDK `2.2.0-beta.1`.
-
-### ⚠ BREAKING CHANGES
-
-* **sample-java:** the Java sample module has been removed. The SDK dropped Java language support (MSK-160); consumers needing a Java reference should stay on the `master` branch (SDK 2.0.x / 2.1.x).
 
 ### Features
 
-* **sdk:** bump `io.axept.android:android-sdk` to `2.2.0-beta.1`.
-* **sample-kotlin:** pass the full `initialize(...)` signature including `widgetType`, `prId`, `consentExpirationDays`, and `shouldUpdateConsentExpiration`.
-* **sample-kotlin:** register `setForceShowConsentDebug()` and the new `onError` listener callback (new in 2.2.0-beta.1).
-* **sample-kotlin:** add `AxeptioStoreDemoScreen` showcasing the new StateFlow-based `AxeptioStore` in Jetpack Compose, reachable from a new entry on the main screen.
+* **kotlin:** demonstrate onConsentSaved() and the new AxeptioStore counters ([8bbface](https://github.com/axeptio/sample-app-android/commit/8bbface39a27410c66de21234a442230ac086dba))
+* **sdk:** bump io.axept.android:android-sdk to 2.5.0 ([96b5004](https://github.com/axeptio/sample-app-android/commit/96b500498ae89eb7b038d54b8996825fea65e021))
 
----
 
-## [1.0.0-beta.2](https://github.com/axeptio/sample-app-android/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-09-02)
+### BREAKING CHANGES
+
+* the samplejava module is removed. The SDK dropped Java
+language support in 2.2.0 and removed the @JvmStatic companions.
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+* the Java sample (samplejava/) is removed. The Android SDK
+dropped Java language support in 2.2.0-beta.1 (MSK-160), so the Java module
+can no longer compile against the SDK. Consumers needing a Java reference
+should stay on master (SDK 2.0.x / 2.1.x).
+
+- Bump axeptio-android-sdk dependency to 2.2.0-beta.1 in samplekotlin.
+- Delete the samplejava/ module and scrub its references from
+  settings.gradle.kts, scripts/update-version.js, .github/workflows/release.yml,
+  .releaserc.json, .gitignore, generate-config.sh, and .idea/gradle.xml.
+- Expand samplekotlin init to the full signature (widgetType, prId,
+  consentExpirationDays, shouldUpdateConsentExpiration) and register
+  setForceShowConsentDebug() and the new onError listener callback.
+- Extend ConfigurationManager / CustomerConfiguration with the new config
+  fields and SharedPreferences persistence; align the stored default
+  cookiesVersion with "google cmp partner program sandbox-en-EU".
+- Add AxeptioStoreDemoScreen demonstrating the StateFlow-based AxeptioStore
+  in Jetpack Compose, reachable from a new entry on MainScreen — this is the
+  Android analogue of iOS 2.2.0-beta.1's SwiftUISampleView.
+- Bump samplekotlin versionName/versionCode and package.json to 2.2.0-beta.1.
+- Add a prominent beta banner, rewrite the README Overview section, and add
+  a 2.2.0-beta.1 CHANGELOG entry.
+
+Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>
+
+
+
+# [1.0.0-beta.2](https://github.com/axeptio/sample-app-android/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-09-02)
 
 
 ### Bug Fixes
@@ -56,19 +65,9 @@ Beta release aligning the public sample app with Axeptio Android SDK `2.2.0-beta
 * apply feedback from PR ([27b0954](https://github.com/axeptio/sample-app-android/commit/27b0954f69db40c4eb0e43d3df5c35b4673c1019))
 * deprecated-api-warnings-in-android-sample-app ([681d812](https://github.com/axeptio/sample-app-android/commit/681d8123fa0fe5f8977697abf870db4dd9dff4a8))
 
-## 1.0.0-beta.1 (2025-08-29)
 
 
-### Features
-
-* add comprehensive automation scripts for Android sample app testing ([1544738](https://github.com/axeptio/sample-app-android/commit/15447382323ddc8e4dcb0cbc518176dd5c2b8885))
-* add SDK version display to main screen header ([57b2b9f](https://github.com/axeptio/sample-app-android/commit/57b2b9f0791252e8229a13624f30cd0a9f831c13))
-* **build:** add comprehensive quality gates and security scanning to ci pipeline ([d6f2361](https://github.com/axeptio/sample-app-android/commit/d6f23616213f82ae4a80af40358303c8626dbd6e))
-* complete sdk implementation instructions ([a99cfe9](https://github.com/axeptio/sample-app-android/commit/a99cfe98a00783b5f990535acfeebee0520bc949))
-* enhance debug capabilities and fix configuration management ([5896441](https://github.com/axeptio/sample-app-android/commit/589644129c0247a315744d1159f9cfb8962af652))
-* implement comprehensive TCF vendor consent testing capabilities ([03846b8](https://github.com/axeptio/sample-app-android/commit/03846b84571ef951674fe8acd8daebf8bf58cd9a))
-* readme instructions ([ba95cdd](https://github.com/axeptio/sample-app-android/commit/ba95cddf24881241b841582e6d2aaa0cf0135f31))
-* **release:** implement comprehensive semantic versioning and automated releases ([09be413](https://github.com/axeptio/sample-app-android/commit/09be4136bafe19f8c406bef6c559c368d46c657c))
+# [1.0.0-beta.1](https://github.com/axeptio/sample-app-android/compare/ba95cddf24881241b841582e6d2aaa0cf0135f31...v1.0.0-beta.1) (2025-08-29)
 
 
 ### Bug Fixes
@@ -84,64 +83,17 @@ Beta release aligning the public sample app with Axeptio Android SDK `2.2.0-beta
 * update README ([19efdd3](https://github.com/axeptio/sample-app-android/commit/19efdd3327e0e854e119eb5a8908d81568640d13))
 * use secrets ([96322dd](https://github.com/axeptio/sample-app-android/commit/96322ddb636ac19c0e4455f6c90b1571ead83fde))
 
-# Changelog
 
-All notable changes to this project will be documented in this file.
+### Features
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+* add comprehensive automation scripts for Android sample app testing ([1544738](https://github.com/axeptio/sample-app-android/commit/15447382323ddc8e4dcb0cbc518176dd5c2b8885))
+* add SDK version display to main screen header ([57b2b9f](https://github.com/axeptio/sample-app-android/commit/57b2b9f0791252e8229a13624f30cd0a9f831c13))
+* **build:** add comprehensive quality gates and security scanning to ci pipeline ([d6f2361](https://github.com/axeptio/sample-app-android/commit/d6f23616213f82ae4a80af40358303c8626dbd6e))
+* complete sdk implementation instructions ([a99cfe9](https://github.com/axeptio/sample-app-android/commit/a99cfe98a00783b5f990535acfeebee0520bc949))
+* enhance debug capabilities and fix configuration management ([5896441](https://github.com/axeptio/sample-app-android/commit/589644129c0247a315744d1159f9cfb8962af652))
+* implement comprehensive TCF vendor consent testing capabilities ([03846b8](https://github.com/axeptio/sample-app-android/commit/03846b84571ef951674fe8acd8daebf8bf58cd9a))
+* readme instructions ([ba95cdd](https://github.com/axeptio/sample-app-android/commit/ba95cddf24881241b841582e6d2aaa0cf0135f31))
+* **release:** implement comprehensive semantic versioning and automated releases ([09be413](https://github.com/axeptio/sample-app-android/commit/09be4136bafe19f8c406bef6c559c368d46c657c))
 
-## [Unreleased]
 
-### Added
-- Advanced SDK APIs for vendor consent management
-  - `getVendorConsents()`: Full vendor consent mapping
-  - `getConsentedVendors()`: List of consented vendor IDs
-  - `getRefusedVendors()`: List of refused vendor IDs
-  - `isVendorConsented()`: Individual vendor consent validation
-  - `getConsentDebugInfo()`: Comprehensive debug information access
-- Debug Consent Info Screen with detailed TCF consent data analysis
-- Vendor Consent Test Screen with live testing interface for vendor validation
-- Configuration Management system with dynamic service switching (Brands ↔ Publishers TCF)
-- SDK Version Display in app header for clear build identification
-- Comprehensive automation scripts for build/test/deploy workflow
-- Complete API documentation with production-ready integration examples
-- Best practice guidelines with comprehensive error handling patterns
-- Material Design 3 implementation throughout sample app
-- Semantic versioning and automated release management
 
-### Fixed
-- Configuration management bug where app was stuck on "Brands" service
-- Clear consent flow now shows proper loading states and visual feedback
-- MainActivity integration now uses ConfigurationManager instead of hardcoded BuildConfig
-
-### Changed
-- Auto-refresh performance optimized from 3s to 10s intervals for better battery usage
-- Enhanced error handling throughout ViewModels with production-ready patterns
-- Thread-safe operations using proper coroutine usage
-
-### Documentation
-- Added extensive README documentation for new vendor consent APIs
-- Enhanced code comments with third-party developer best practices
-- Clarified ConfigurationManager scope as sample-app specific (not SDK API)
-
-## [2.0.6] - 2024-08-26
-
-### Added
-- Initial sample applications for Axeptio Android SDK
-- Java sample app (`samplejava`) with XML layouts
-- Kotlin sample app (`samplekotlin`) with Jetpack Compose
-- Google Consent Mode v2 integration examples
-- Firebase Analytics integration
-- Publishers and Brands build variants
-- Basic consent management functionality
-- SharedPreferences monitoring capabilities
-
-### Documentation
-- Comprehensive README with integration guides
-- SDK initialization examples for both Java and Kotlin
-- Google Consent Mode implementation examples
-- Build variant configuration instructions
-
-[Unreleased]: https://github.com/axeptio/sample-app-android/compare/2.0.6...HEAD
-[2.0.6]: https://github.com/axeptio/sample-app-android/releases/tag/2.0.6
