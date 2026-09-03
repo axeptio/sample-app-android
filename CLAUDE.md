@@ -25,8 +25,10 @@ sample demonstrates SDK 2.5.0". Three consequences:
 1. `samplekotlin/build.gradle.kts` is the source of truth. `versionName` must equal `package.json`'s
    version **and** the `axeptioSdkVersion` constant. `scripts/declared-version.sh` enforces both and
    fails the build otherwise; it runs in CI.
-2. `node scripts/update-version.js <version>` sets `versionCode`/`versionName` + `package.json` —
-   and **nothing else**. `axeptioSdkVersion` and the README's dependency snippets are hand-edited.
+2. `node scripts/update-version.js <version>` sets `versionCode`/`versionName`, and delegates to
+   `npm version` for `package.json` **and `package-lock.json`** — commit both, since all three CI
+   jobs run `npm ci`, which fails if they disagree. It touches **nothing else**: `axeptioSdkVersion`
+   and the README's dependency snippets are hand-edited.
 3. **Bumping the version on `master` is what publishes a release.** There is no separate release
    trigger. Do not bump casually.
 
