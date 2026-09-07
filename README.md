@@ -2,7 +2,7 @@
 
 # Axeptio Android SDK Documentation
 
-> **Aligned with Axeptio Android SDK `2.5.0`.** This repository ships a single module — `samplekotlin` (Kotlin + Jetpack Compose). The `samplejava/` module was removed when the SDK dropped Java language support in `2.2.0`; see [Migrating from Java](#migrating-from-java).
+> **Aligned with Axeptio Android SDK `2.5.1`.** This repository ships a single module — `samplekotlin` (Kotlin + Jetpack Compose). The `samplejava/` module was removed when the SDK dropped Java language support in `2.2.0`; see [Migrating from Java](#migrating-from-java).
 
 [![License](https://img.shields.io/badge/license-Axeptio%20Terms-blue.svg)](https://www.axept.io/fr/?axeptio_contract=terms_of_use_en) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/axeptio/sample-app-android/pulls)  [![Axeptio SDK Version](https://img.shields.io/github/v/release/axeptio/axeptio-android-sdk)](https://github.com/axeptio/axeptio-android-sdk/releases) [![Kotlin Integration](https://img.shields.io/badge/Integration-Kotlin%20%26%20Compose-blue)](https://github.com/axeptio/sample-app-android/tree/master/samplekotlin) [![Android SDK Compatibility](https://img.shields.io/badge/Android%20SDK-%3E%3D%2026-blue)](https://developer.android.com/studio)
  
@@ -38,7 +38,7 @@ Welcome to the Axeptio Mobile SDK Samples project! This repository demonstrates 
 <br><br>
 
 ## Overview
-The repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.5.0` with Kotlin and Jetpack Compose. It can be built using either the **brands** or **publishers** variants.
+The repository ships a single module — `samplekotlin` — which demonstrates the Axeptio Android SDK `2.5.1` with Kotlin and Jetpack Compose. It can be built using either the **brands** or **publishers** variants.
 
 ### Sample App Features
 The `samplekotlin` module includes additional debugging and testing capabilities:
@@ -143,7 +143,7 @@ To test SDK changes using a cookie configuration from the production backoffice,
 
 To test the version currently in production, instead checkout the `sample-app-android repository`, configure the widget, and in `build.gradle.kts` set the desired SDK version, for example: 
 ```gradle
-implementation("io.axept.android:android-sdk:2.5.0")
+implementation("io.axept.android:android-sdk:2.5.1")
 ```
 To configure the widget, update the productFlavors in `build.gradle.kts` with the appropriate `AXEPTIO_CLIENT_ID`, `AXEPTIO_COOKIES_VERSION`, and `AXEPTIO_TARGET_SERVICE`. Example:
 ```kotlin
@@ -251,13 +251,13 @@ After adding the repository, include the Axeptio SDK as a dependency in your pro
  - **Kotlin DSL**
 ```kotlin
 dependencies {  
-    implementation("io.axept.android:android-sdk:2.5.0")
+    implementation("io.axept.android:android-sdk:2.5.1")
 }
 ```
  - **Groovy**
 ```groovy
 dependencies {
-    implementation 'io.axept.android:android-sdk:2.5.0'
+    implementation 'io.axept.android:android-sdk:2.5.1'
 }
 ```
 For more detailed instructions, refer to the [GitHub Documentation](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-gradle-registry#using-a-published-package)
@@ -417,6 +417,11 @@ The two callbacks cover the two ways consent arrives, and exactly one of them fi
 | Replayed to late listeners | no | no |
 
 Both are delivered on the main thread, and in both cases `getVendorConsents()` / `getConsentedVendors()` already reflect the consent by the time the callback runs. `onConsentSaved()` still fires if the read-back afterwards fails or comes back empty — the decision itself happened. Make both handlers idempotent.
+
+> [!NOTE]
+> **On the Brands service, `onConsentSaved()` fired too early before SDK `2.5.1`** — before the
+> decision cookies were actually persisted. Fixed in `2.5.1`; if you're pinned to `2.5.0` on Brands,
+> don't assume the cookies are readable the instant this callback fires.
 
 ##### Reactive consumption with `AxeptioStore` (Compose)
 `AxeptioStore` implements `AxeptioEventListener` and re-exposes the events as `StateFlow`s for Jetpack Compose. It does not register itself, which keeps the lifecycle explicit:
@@ -586,6 +591,12 @@ AxeptioSDK.instance().setEventListener(object : AxeptioEventListener {
 > `2.5.0`. If you are pinned to `2.4.0`, read consent state directly (`getVendorConsents()` and
 > friends are populated once restoration completes) or use `onGoogleConsentModeUpdate()`, which is
 > delivered correctly during silent restoration on both versions.
+
+> [!IMPORTANT]
+> **`2.5.0` still had two flavor-specific gaps, both fixed in `2.5.1`.** On Publishers,
+> `onCMPRestored()` could miss firing for a specific silent-restore payload shape. On Brands, silent
+> restore could tear down the flow entirely when the underlying `getConsentStatus` read failed instead
+> of degrading gracefully. Upgrade to `2.5.1` if you rely on `onCMPRestored()` on either flavor.
 
 See [`AxeptioStoreDemoScreen.kt`](samplekotlin/src/main/java/io/axept/samplekotlin/screen/AxeptioStoreDemoScreen.kt) for a live counter. From `2.5.0`, `AxeptioStore` exposes a `cmpRestoredEventCount` flow, so the sample observes it through the store alone — no second listener needed.
 
