@@ -13,7 +13,7 @@ plugins {
 // `versionName` below deliberately mirrors it, but stays a literal: scripts/update-version.js
 // rewrites it by regex and scripts/declared-version.sh parses it with awk, and neither can see
 // through a variable. declared-version.sh compares the two and fails the build if they drift.
-val axeptioSdkVersion = "2.5.0"
+val axeptioSdkVersion = "2.5.1"
 
 android {
     namespace = "io.axept.samplekotlin"
@@ -24,8 +24,8 @@ android {
         minSdk = 26
         targetSdk = 35
 
-        versionCode = 20500
-        versionName = "2.5.0"
+        versionCode = 20501
+        versionName = "2.5.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
