@@ -1,4 +1,4 @@
-# [2.6.0](https://github.com/axeptio/sample-app-android/compare/v2.5.0...v2.6.0) (2026-09-07)
+# [2.5.1](https://github.com/axeptio/sample-app-android/compare/v2.5.0...v2.5.1) (2026-09-07)
 
 
 ### Features
