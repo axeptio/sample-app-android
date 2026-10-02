@@ -4,9 +4,9 @@ name: Validate PR Title
 #
 # Kept fully inline rather than calling axeptio/tech-scripts: this repo is public and
 # cannot access Axeptio's internal reusable workflows, so the `uses:` form failed at the
-# workflow level (0s, no jobs) on every PR. Same reasoning as ui-tests.yml.
+# workflow level (0s, no jobs) on every PR.
 #
-# Ported from tech-scripts validate-pull-request-title-v1.0.0 unchanged. Here `sdk` is a commitlint
+# Ported from tech-scripts validate-pull-request-title-v1.0.0. Here `sdk` is a commitlint
 # scope (see .commitlintrc.json), not a type, so it is deliberately not in the type list.
 
 on:
