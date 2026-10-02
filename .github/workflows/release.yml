@@ -256,6 +256,13 @@ jobs:
           # the token wired into the remote explicitly.
           git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git"
 
+      # This action has no `version` input (one was passed here previously; it's not in the action's
+      # input list, so it was silently ignored — GitHub just logs "Unexpected input(s) 'version'").
+      # It always computes its own next version from conventional-commit types since the last `v*`
+      # tag (feat -> minor, fix -> patch, ...), with no way to know this repo's actual versioning
+      # rule: the sample app's version mirrors the SDK version it targets, which commit history
+      # cannot infer. See the "Correct changelog version header" step below for what happens when
+      # that guess disagrees with the declared version.
       - name: Generate Changelog
         if: steps.declared.outputs.changed == 'true'
         id: changelog
@@ -268,9 +275,26 @@ jobs:
           skip-commit: true
           skip-tag: true
           git-push: false
-          version: ${{ steps.declared.outputs.version }}
           tag-prefix: 'v'
           output-file: 'CHANGELOG.md'
+
+      # A bugfix-only SDK bump authored as `feat(sdk): ...` (matching the commit-type convention of
+      # an earlier, genuinely-minor bump) is enough to make the action guess wrong — it happened for
+      # v2.5.1, whose CHANGELOG.md entry was generated as "2.6.0", a version that was never tagged.
+      # Since the declared version is the only thing that actually gets tagged and released, rewrite
+      # the freshly prepended entry (always the file's first line) to match it whenever they differ,
+      # so CHANGELOG.md never cites a version nobody shipped.
+      - name: Correct changelog version header if it disagrees with the declared version
+        if: steps.declared.outputs.changed == 'true' && steps.changelog.outputs.skipped != 'true' && steps.changelog.outputs.version != steps.declared.outputs.version
+        env:
+          COMPUTED: ${{ steps.changelog.outputs.version }}
+          DECLARED: ${{ steps.declared.outputs.version }}
+        run: |
+          set -euo pipefail
+          echo "::warning::conventional-changelog-action guessed v$COMPUTED from commit types, but v$DECLARED is the declared (and about to be tagged) version. Rewriting the new CHANGELOG.md entry to v$DECLARED. Check the version-bump commit's type against CLAUDE.md's release notes so future guesses land correctly."
+          COMPUTED_ESCAPED=$(printf '%s' "$COMPUTED" | sed 's/[.[\*^$]/\\&/g')
+          { head -n1 CHANGELOG.md | sed "s/$COMPUTED_ESCAPED/$DECLARED/g"; tail -n +2 CHANGELOG.md; } > CHANGELOG.md.tmp
+          mv CHANGELOG.md.tmp CHANGELOG.md
 
       - name: Commit Changelog
         if: steps.declared.outputs.changed == 'true' && steps.changelog.outputs.skipped != 'true'
