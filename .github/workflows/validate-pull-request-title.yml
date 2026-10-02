@@ -6,8 +6,8 @@ name: Validate PR Title
 # cannot access Axeptio's internal reusable workflows, so the `uses:` form failed at the
 # workflow level (0s, no jobs) on every PR.
 #
-# Ported from tech-scripts validate-pull-request-title-v1.0.0. Here `sdk` is a commitlint
-# scope (see .commitlintrc.json), not a type, so it is deliberately not in the type list.
+# Ported from tech-scripts validate-pull-request-title-v1.0.0. Types and scopes mirror
+# .commitlintrc.json (keep in sync): `hotfix`/`release` are not types here, `sdk` is a scope.
 
 on:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
           # Read inside the script via process.env rather than interpolated into it —
           # the PR title is attacker-controlled on fork PRs and must never be treated
           # as code.
-          ALLOWED_TYPES: 'build,chore,ci,docs,feat,fix,hotfix,perf,refactor,release,revert,style,test'
+          ALLOWED_TYPES: 'build,chore,ci,docs,feat,fix,perf,refactor,revert,style,test'
         with:
           github-token: ${{ github.token }}
           script: |
@@ -81,6 +81,19 @@ jobs:
         with:
           wip: false
           requireScope: false
+          scopes: |
+            api
+            sdk
+            ui
+            config
+            build
+            docs
+            test
+            release
+            deps
+            kotlin
+            java
+            android
           types: |
             build
             chore
@@ -88,10 +101,8 @@ jobs:
             docs
             feat
             fix
-            hotfix
             perf
             refactor
-            release
             revert
             style
             test
