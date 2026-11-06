@@ -266,7 +266,7 @@ jobs:
       - name: Generate Changelog
         if: steps.declared.outputs.changed == 'true'
         id: changelog
-        uses: TriPSs/conventional-changelog-action@3c4970b6573374889b897403d2f1278c395ea0df # v5.4.0
+        uses: TriPSs/conventional-changelog-action@469f0e5e35831fbd1962706f29f65daf0a5723f2 # v6.5.0
         with:
           github-token: ${{ secrets.BOT_GITHUB_TOKEN }}
           git-user-name: axeptio-release-bot
